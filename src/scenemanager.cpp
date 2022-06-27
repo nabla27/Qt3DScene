@@ -260,7 +260,9 @@ void SceneManager::createNewEntity(QAction *addEntityAction)
     case ECStruct::EntitySet::ExtrudedText:
     {
         entity = new Qt3DCore::QEntity;
-        entity->addComponent(new Qt3DExtras::QExtrudedTextMesh(entity));
+        Qt3DExtras::QExtrudedTextMesh *mesh = new Qt3DExtras::QExtrudedTextMesh(entity);
+        entity->addComponent(mesh);
+        mesh->setText("Extruded Text");
         entity->addComponent(new Qt3DExtras::QPhongMaterial(entity));
         entity->addComponent(new Qt3DCore::QTransform(entity));
         break;
