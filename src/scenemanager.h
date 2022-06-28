@@ -14,21 +14,22 @@ struct ECStruct : public QObject
 
 public:
     static constexpr int enumStride = 100;
+    static constexpr int enumOffset = 1000;
     enum class EntityType { Empty, Object2D, Object3D, Camera };
 
     enum class EntitySet
     {
         /* Empty */
-        Empty = 0,
+        Empty = 1000,
 
         /* Object2D */
-        Text2D = 100, Line,
+        Text2D = 1100, Line,
 
         /* Object3D */
-        Cone = 200, Cuboid, Cylinder, ExtrudedText, Plane, Sphere, Torus,
+        Cone = 1200, Cuboid, Cylinder, ExtrudedText, Plane, Sphere, Torus,
 
         /* Camera */
-        FirstPersonCamera = 300, OrbitCamera,
+        FirstPersonCamera = 1300, OrbitCamera,
     };
 
     Q_ENUM(EntityType)
@@ -120,6 +121,8 @@ private slots:
     void renameSelectedItem();
     void removeSelectedItem();
 
+    void emitSelectedEntity(QTreeWidgetItem *item, int column);
+
 private:
     void setupLayout();
     void setupContextMenu();
@@ -132,6 +135,7 @@ private:
 
 signals:
     void topLevelEntityCreated(Qt3DCore::QEntity *entity);
+    void entitySelected(Qt3DCore::QEntity *entity);
 };
 
 

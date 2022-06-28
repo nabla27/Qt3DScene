@@ -83,7 +83,7 @@ EntityMenu::EntityMenu(QWidget *parent)
         const int index = getEnumIndex<ECStruct::EntitySet>(name);
         if(index % ECStruct::enumStride == 0)
         {
-            const QString title = enumToString(ECStruct::EntityType(index / ECStruct::enumStride));
+            const QString title = enumToString(ECStruct::EntityType((index - ECStruct::enumOffset) / ECStruct::enumStride));
             parentMenu = addMenu(title);
             parentMenu->addAction(name);
         }
@@ -109,8 +109,17 @@ EntityMenu::EntityMenu(QWidget *parent)
 
 #include <QToolBar>
 #include <QVBoxLayout>
-#include <QApplication>
-#include <Qt3DExtras>
+
+#include <Qt3DExtras/QText2DEntity>
+#include <Qt3DExtras/QConeMesh>
+#include <Qt3DExtras/QCuboidMesh>
+#include <Qt3DExtras/QCylinderMesh>
+#include <Qt3DExtras/QExtrudedTextMesh>
+#include <Qt3DExtras/QPlaneMesh>
+#include <Qt3DExtras/QSphereMesh>
+#include <Qt3DExtras/QTorusMesh>
+#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DCore/QTransform>
 
 SceneManager::SceneManager(QWidget *parent)
     : QWidget(parent)
@@ -124,6 +133,7 @@ SceneManager::SceneManager(QWidget *parent)
 
     connect(entityMenu, &QMenu::triggered, this, &SceneManager::createNewEntity);
     connect(entityTree, &EntityTreeWidget::customContextMenuRequested, this, &SceneManager::onContextMenu);
+    connect(entityTree, &EntityTreeWidget::itemDoubleClicked, this, &SceneManager::emitSelectedEntity);
 }
 
 void SceneManager::setupLayout()
@@ -200,6 +210,16 @@ void SceneManager::removeSelectedItem()
 
         delete currentItem;
         currentItem = nullptr;
+    }
+}
+
+void SceneManager::emitSelectedEntity(QTreeWidgetItem *item, int column)
+{
+    if(column != 0) return;
+
+    if(EntityTreeItem *entityItem = static_cast<EntityTreeItem*>(item))
+    {
+        emit entitySelected(entityItem->entity());
     }
 }
 
