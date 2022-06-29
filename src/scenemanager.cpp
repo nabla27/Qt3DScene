@@ -76,26 +76,32 @@ EntityMenu::EntityMenu(QWidget *parent)
 {
     QMenu *parentMenu = nullptr;
 
-    const QStringList entitySet = enumToStrings(ECStruct::EntitySet(0));
+    const int enumCount = getEnumCount(ECStruct::EntitySet(0));
+    int count = 0;
 
-    for(const QString& name : entitySet)
+    for(int i = 0; count < enumCount; ++i)
     {
-        const int index = getEnumIndex<ECStruct::EntitySet>(name);
-        if(index % ECStruct::enumStride == 0)
+        const QString name = enumToString(ECStruct::EntitySet(i));
+
+        if(!name.isEmpty())
         {
-            const QString title = enumToString(ECStruct::EntityType((index - ECStruct::enumOffset) / ECStruct::enumStride));
-            parentMenu = addMenu(title);
-            parentMenu->addAction(name);
-        }
-        else
-        {
+            if((i - ECStruct::enumOffset) % ECStruct::enumStride == 0)
+                parentMenu = this->addMenu(enumToString(ECStruct::EntityType((i - ECStruct::enumOffset) / ECStruct::enumStride)));
+
             if(parentMenu)
             {
-                parentMenu->addAction(name);
+                auto emitSelectedItem = [this, i]() { emit selected(ECStruct::EntitySet(i)); };
+                QAction *action = parentMenu->addAction(name);
+                connect(action, &QAction::triggered, emitSelectedItem);
             }
+
+            count++;
         }
     }
 }
+
+
+
 
 
 
@@ -131,7 +137,7 @@ SceneManager::SceneManager(QWidget *parent)
     setupLayout();
     setupContextMenu();
 
-    connect(entityMenu, &QMenu::triggered, this, &SceneManager::createNewEntity);
+    connect(entityMenu, &EntityMenu::selected, this, &SceneManager::createNewEntity);
     connect(entityTree, &EntityTreeWidget::customContextMenuRequested, this, &SceneManager::onContextMenu);
     connect(entityTree, &EntityTreeWidget::itemDoubleClicked, this, &SceneManager::emitSelectedEntity);
 }
@@ -145,7 +151,7 @@ void SceneManager::setupLayout()
     vLayout->addWidget(entityTree);
 
     toolBar->setIconSize(QSize(15, 15));
-    QAction *addEntityAction = toolBar->addAction(QIcon(QPixmap(":/icon/plus")), "add entity");
+    QAction *addEntityAction = toolBar->addAction(QIcon(QPixmap(":/icon/plus")), "Add entity");
 
     vLayout->setSpacing(0);
     vLayout->setContentsMargins(0, 0, 0, 0);
@@ -159,11 +165,11 @@ void SceneManager::setupLayout()
 
 void SceneManager::setupContextMenu()
 {
-    QAction *addEntityAction = contextMenu->addAction("Add sub entity");
+    QAction *addEntityAction = contextMenu->addMenu(entityMenu);
     QAction *renameEntityAction = contextMenu->addAction("Rename");
     QAction *removeEntityAction = contextMenu->addAction("Remove");
 
-    connect(addEntityAction, &QAction::triggered, this, &SceneManager::requestSubEntity);
+    addEntityAction->setText("Add sub entity");
     connect(renameEntityAction, &QAction::triggered, this, &SceneManager::renameSelectedItem);
     connect(removeEntityAction, &QAction::triggered, this, &SceneManager::removeSelectedItem);
 }
@@ -174,18 +180,9 @@ void SceneManager::requestTopLevelEntity()
     entityMenu->exec(cursor().pos());
 }
 
-void SceneManager::requestSubEntity()
-{
-    if(entityTree->selectedItems().count() > 0)
-        targetEntityItem = static_cast<EntityTreeItem*>(entityTree->selectedItems().at(0));
-    else
-        targetEntityItem = nullptr;
-
-    entityMenu->exec(cursor().pos());
-}
-
 void SceneManager::onContextMenu(const QPoint& pos)
 {
+    if(EntityTreeItem *currentItem = static_cast<EntityTreeItem*>(entityTree->currentItem())) targetEntityItem = currentItem;
     contextMenu->exec(mapToGlobal(pos));
 }
 
@@ -219,16 +216,13 @@ void SceneManager::emitSelectedEntity(QTreeWidgetItem *item, int column)
 
     if(EntityTreeItem *entityItem = static_cast<EntityTreeItem*>(item))
     {
-        emit entitySelected(entityItem->entity());
+        emit entityItemSelected(entityItem);
     }
 }
 
-void SceneManager::createNewEntity(QAction *addEntityAction)
+void SceneManager::createNewEntity(ECStruct::EntitySet entityEnum)
 {
     Qt3DCore::QEntity *entity = nullptr;
-
-    const QString entityName = addEntityAction->text();
-    const ECStruct::EntitySet entityEnum = ECStruct::EntitySet(getEnumIndex<ECStruct::EntitySet>(entityName));
 
     switch(entityEnum)
     {
@@ -329,6 +323,7 @@ void SceneManager::createNewEntity(QAction *addEntityAction)
 
 
     EntityTreeItem *entityTreeItem;
+    const QString entityName = enumToString(entityEnum);
     if(targetEntityItem)
     {
         entity->setParent(targetEntityItem->entity());

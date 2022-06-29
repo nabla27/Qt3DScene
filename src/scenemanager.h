@@ -16,7 +16,6 @@ public:
     static constexpr int enumStride = 100;
     static constexpr int enumOffset = 1000;
     enum class EntityType { Empty, Object2D, Object3D, Camera };
-
     enum class EntitySet
     {
         /* Empty */
@@ -32,8 +31,25 @@ public:
         FirstPersonCamera = 1300, OrbitCamera,
     };
 
+    enum class ComponentType { Transform, Material, Mesh };
+    enum class ComponentsSet
+    {
+        /* Transform */
+        Transform = 1000,
+
+        /* Material */
+        DiffuseMapMaterial = 1100, DiffuseSpecularMapMaterial, DiffuseSpecularMaterial, GoochMaterial, MetalRougthMaterial, MorphPhongMaterial,
+        NormalDiffuseMapMaterial, NormalDiffuseSpecularMapMaterial, PerVertexColorMaterial, PhongAlphaMaterial, PhongMaterial, TextureMaterial,
+
+        /* Mesh */
+        Cone = 1200, Cuboid, Cylinder, ExtrudedText, Plane, Sphere, Torus,
+    };
+
+
     Q_ENUM(EntityType)
     Q_ENUM(EntitySet)
+    Q_ENUM(ComponentType)
+    Q_ENUM(ComponentsSet)
 };
 
 
@@ -95,7 +111,13 @@ class EntityMenu : public QMenu
     Q_OBJECT
 public:
     explicit EntityMenu(QWidget *parent);
+
+signals:
+    void selected(ECStruct::EntitySet entityEnum);
 };
+
+
+
 
 
 
@@ -114,8 +136,7 @@ public:
 
 private slots:
     void requestTopLevelEntity();
-    void requestSubEntity();
-    void createNewEntity(QAction *addEntityAction);
+    void createNewEntity(ECStruct::EntitySet entityEnum);
 
     void onContextMenu(const QPoint& pos);
     void renameSelectedItem();
@@ -135,7 +156,7 @@ private:
 
 signals:
     void topLevelEntityCreated(Qt3DCore::QEntity *entity);
-    void entitySelected(Qt3DCore::QEntity *entity);
+    void entityItemSelected(EntityTreeItem *entityItem);
 };
 
 

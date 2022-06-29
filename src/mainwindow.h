@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "scenemanager.h"
+#include "componentmanager.h"
 
 class Window3D;
 
@@ -21,6 +22,7 @@ private:
     QDockWidget *componentDockWidget;
     QDockWidget *sceneDockWidget;
     SceneManager *sceneManager;
+    ComponentManager *componentManager;
 
 signals:
 

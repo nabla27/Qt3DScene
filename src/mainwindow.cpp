@@ -13,12 +13,14 @@ MainWindow::MainWindow(QWidget *parent)
     , componentDockWidget(new QDockWidget("Component", this))
     , sceneDockWidget(new QDockWidget("Scene", this))
     , sceneManager(new SceneManager(sceneDockWidget))
+    , componentManager(new ComponentManager(componentDockWidget))
 {
     setGeometry(getRectFromScreenRatio(this->screen()->size(), 0.6f, 0.6f));
 
     setupLayout();
 
     connect(sceneManager, &SceneManager::topLevelEntityCreated, window3d, &Window3D::addEntity);
+    connect(sceneManager, &SceneManager::entityItemSelected, componentManager, &ComponentManager::setCurrentEntityItem);
 }
 
 void MainWindow::setupLayout()
@@ -34,7 +36,9 @@ void MainWindow::setupLayout()
     sceneDockWidget->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
 
     sceneDockWidget->setWidget(sceneManager);
+    componentDockWidget->setWidget(componentManager);
 
     sceneDockWidget->setContentsMargins(0, 0, 0, 0);
+    componentDockWidget->setContentsMargins(0, 0, 0, 0);
     setContentsMargins(0, 0, 0, 0);
 }
