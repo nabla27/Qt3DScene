@@ -30,9 +30,52 @@ signals:
 
 
 
-#include <QWidget>
+
 #include <QCheckBox>
 #include <QLineEdit>
+#include <QVBoxLayout>
+#include <QScrollArea>
+class ComponentsSettingWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    ComponentsSettingWidget(EntityTreeItem *entityItem);
+
+private slots:
+    void showComponentsMenu();
+    void receiveItemChanging();
+    void setEntityName(const QString& name);
+    void setEntityEnable(const bool checked);
+
+private:
+    void setupLayout();
+
+private:
+    EntityTreeItem *entityItem;
+
+    ComponentsMenu *componentsMenu;
+
+    QLineEdit *entityNameEdit;
+    QCheckBox *entityEnableCheck;
+
+    QScrollArea *scrollArea;
+    QWidget *contentsArea;
+    QVBoxLayout *contentsLayout;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <QStackedWidget>
 class ComponentManager : public QWidget
 {
     Q_OBJECT
@@ -42,18 +85,28 @@ public:
 public slots:
     void setCurrentEntityItem(EntityTreeItem *item);
 
-private slots:
-    void showComponentsMenu();
-
 private:
     void setupLayout();
 
 private:
     EntityTreeItem *currentEntityItem;
-    ComponentsMenu *componentsMene;
+    QStackedWidget *settingPageStack;
 
 signals:
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif // COMPONENTMANAGER_H

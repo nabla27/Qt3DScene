@@ -1,15 +1,18 @@
 #include "scenemanager.h"
+#include "componentmanager.h"
 
-EntityTreeItem::EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeWidget *widget, const QStringList& text, int type)
-    : QTreeWidgetItem(widget, text, type)
-    , _entity(entity)
+EntityTreeItem::EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeWidget *widget, const QStringList& name, int type)
+    : QTreeWidgetItem(widget, name, type)
+    , entity(entity)
+    , componentsSetting(new ComponentsSettingWidget(this))
 {
     setup();
 }
 
-EntityTreeItem::EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeItem *item, const QStringList& text, int type)
-    : QTreeWidgetItem(item, text, type)
-    , _entity(entity)
+EntityTreeItem::EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeItem *item, const QStringList& name, int type)
+    : QTreeWidgetItem(item, name, type)
+    , entity(entity)
+    , componentsSetting(new ComponentsSettingWidget(this))
 {
     setup();
 }
@@ -19,7 +22,7 @@ void EntityTreeItem::setup()
     setUnEditableMode();
     setCheckState(0, Qt::CheckState::Checked);
 
-    connect(this, &EntityTreeItem::destroyed, _entity, &Qt3DCore::QEntity::deleteLater);
+    connect(this, &EntityTreeItem::destroyed, entity, &Qt3DCore::QEntity::deleteLater);
 }
 
 void EntityTreeItem::setEditableMode()
@@ -52,6 +55,7 @@ EntityTreeWidget::EntityTreeWidget(QWidget *parent)
     setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
 
     connect(this, &EntityTreeWidget::itemClicked, this, &EntityTreeWidget::receiveClickedAction);
+    connect(this, &EntityTreeWidget::itemChanged, this, &EntityTreeWidget::emitItemChanging);
 }
 
 void EntityTreeWidget::receiveClickedAction(QTreeWidgetItem *item, int column)
@@ -59,7 +63,15 @@ void EntityTreeWidget::receiveClickedAction(QTreeWidgetItem *item, int column)
     if(column == 0)
     {
         const bool isChecked = (item->checkState(0) == Qt::CheckState::Checked) ? true : false;
-        static_cast<EntityTreeItem*>(item)->entity()->setEnabled(isChecked);
+        static_cast<EntityTreeItem*>(item)->entity->setEnabled(isChecked);
+    }
+}
+
+void EntityTreeWidget::emitItemChanging(QTreeWidgetItem *item, int column)
+{
+    if(EntityTreeItem *entityItem = static_cast<EntityTreeItem*>(item))
+    {
+        emit entityItem->itemChanged();
     }
 }
 
@@ -326,7 +338,7 @@ void SceneManager::createNewEntity(ECStruct::EntitySet entityEnum)
     const QString entityName = enumToString(entityEnum);
     if(targetEntityItem)
     {
-        entity->setParent(targetEntityItem->entity());
+        entity->setParent(targetEntityItem->entity);
         entityTreeItem = new EntityTreeItem(entity, targetEntityItem, QStringList() << entityName, (int)entityEnum);
         targetEntityItem->addChild(entityTreeItem);
     }

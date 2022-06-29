@@ -61,24 +61,28 @@ public:
 
 
 class EntityTreeWidget;
+class ComponentsSettingWidget;
 
 class EntityTreeItem : public QObject, public QTreeWidgetItem
 {
     Q_OBJECT
 public:
-    explicit EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeWidget *widget, const QStringList& text, int type);
-    explicit EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeItem* item, const QStringList& text, int type);
+    explicit EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeWidget *widget, const QStringList& name, int type);
+    explicit EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeItem* item, const QStringList& name, int type);
 
 public:
-    Qt3DCore::QEntity* entity() { return _entity; }
     void setEditableMode();
     void setUnEditableMode();
 
 private:
     void setup();
 
-private:
-    Qt3DCore::QEntity *_entity;
+public:
+    Qt3DCore::QEntity *entity;
+    ComponentsSettingWidget *componentsSetting;
+
+signals:
+    void itemChanged();
 };
 
 
@@ -96,8 +100,9 @@ class EntityTreeWidget : public QTreeWidget
 public:
     explicit EntityTreeWidget(QWidget *parent);
 
-public slots:
+private slots:
     void receiveClickedAction(QTreeWidgetItem *item, int column);
+    void emitItemChanging(QTreeWidgetItem *item, int column);
 };
 
 

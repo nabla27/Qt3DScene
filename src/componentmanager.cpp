@@ -43,16 +43,105 @@ ComponentsMenu::ComponentsMenu(QWidget *parent)
 
 
 
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QCheckBox>
-#include <QLineEdit>
+
+
+
 #include <QToolBar>
+ComponentsSettingWidget::ComponentsSettingWidget(EntityTreeItem *entityItem)
+    : QWidget(nullptr)
+    , entityItem(entityItem)
+    , componentsMenu(new ComponentsMenu(this))
+    , entityNameEdit(new QLineEdit(this))
+    , entityEnableCheck(new QCheckBox(this))
+    , scrollArea(new QScrollArea(this))
+    , contentsArea(new QWidget(scrollArea))
+    , contentsLayout(new QVBoxLayout(contentsArea))
+{
+    setupLayout();
+
+    connect(entityItem, &EntityTreeItem::itemChanged, this, &ComponentsSettingWidget::receiveItemChanging);
+    connect(entityNameEdit, &QLineEdit::textChanged, this, &ComponentsSettingWidget::setEntityName);
+    connect(entityEnableCheck, &QCheckBox::toggled, this, &ComponentsSettingWidget::setEntityEnable);
+}
+
+void ComponentsSettingWidget::setupLayout()
+{
+    QVBoxLayout *vLayout = new QVBoxLayout(this);
+    QToolBar *toolBar = new QToolBar(this);
+
+    setLayout(vLayout);
+    vLayout->addWidget(toolBar);
+    QAction *addComponentsAction = toolBar->addAction(QIcon(QPixmap(":/icon/plus")), "Add component");
+    toolBar->addWidget(entityNameEdit);
+    toolBar->addWidget(entityEnableCheck);
+    vLayout->addWidget(scrollArea);
+    scrollArea->setWidget(contentsArea);
+    contentsArea->setLayout(contentsLayout);
+
+    vLayout->setAlignment(Qt::AlignmentFlag::AlignTop);
+    toolBar->setIconSize(QSize(15, 15));
+    entityNameEdit->setFixedHeight(20);
+    scrollArea->setWidgetResizable(true);
+    contentsLayout->setAlignment(Qt::AlignmentFlag::AlignTop);
+
+    vLayout->setSpacing(0);
+    vLayout->setContentsMargins(0, 0, 0, 0);
+    toolBar->setContentsMargins(0, 0, 0, 0);
+    toolBar->layout()->setSpacing(5);
+    toolBar->layout()->setContentsMargins(0, 0, 5, 0);
+    scrollArea->setContentsMargins(0, 0, 0, 0);
+    contentsArea->setContentsMargins(0, 0, 0, 0);
+
+    connect(addComponentsAction, &QAction::triggered, this, &ComponentsSettingWidget::showComponentsMenu);
+}
+
+void ComponentsSettingWidget::showComponentsMenu()
+{
+    componentsMenu->exec(cursor().pos());
+}
+
+void ComponentsSettingWidget::receiveItemChanging()
+{
+    entityEnableCheck->setCheckState(entityItem->checkState(0));
+    entityNameEdit->setText(entityItem->text(0));
+}
+
+void ComponentsSettingWidget::setEntityName(const QString& name)
+{
+    entityItem->setText(0, name);
+}
+
+void ComponentsSettingWidget::setEntityEnable(const bool checked)
+{
+    entityItem->entity->setEnabled(checked);
+    entityItem->setCheckState(0, (checked) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ComponentManager::ComponentManager(QWidget *parent)
     : QWidget(parent)
     , currentEntityItem(nullptr)
-    , componentsMene(new ComponentsMenu(this))
+    , settingPageStack(new QStackedWidget(this))
 {
     setupLayout();
 }
@@ -60,34 +149,24 @@ ComponentManager::ComponentManager(QWidget *parent)
 void ComponentManager::setupLayout()
 {
     QVBoxLayout *vLayout = new QVBoxLayout(this);
-    QToolBar *toolBar = new QToolBar(this);
 
     setLayout(vLayout);
-
-    vLayout->addWidget(toolBar);
+    vLayout->addWidget(settingPageStack);
 
     vLayout->setAlignment(Qt::AlignmentFlag::AlignTop);
-    QAction *addComponentAction = toolBar->addAction(QIcon(QPixmap(":/icon/plus")), "Add component");
-    toolBar->setIconSize(QSize(15, 15));
 
     setContentsMargins(0, 0, 0, 0);
     vLayout->setSpacing(0);
     vLayout->setContentsMargins(0, 0, 0, 0);
-    toolBar->setContentsMargins(0, 0, 0, 0);
-    toolBar->layout()->setSpacing(0);
-    toolBar->layout()->setContentsMargins(0, 0, 0, 0);
-
-    connect(addComponentAction, &QAction::triggered, this, &ComponentManager::showComponentsMenu);
 }
 
 void ComponentManager::setCurrentEntityItem(EntityTreeItem *item)
 {
-    qDebug() << item->text(0);
+    if(settingPageStack->indexOf(item->componentsSetting) == -1)
+        settingPageStack->addWidget(item->componentsSetting);
+    settingPageStack->setCurrentWidget(item->componentsSetting);
+    item->componentsSetting->setParent(settingPageStack);
 }
 
-void ComponentManager::showComponentsMenu()
-{
-    componentsMene->exec(cursor().pos());
-}
 
 
