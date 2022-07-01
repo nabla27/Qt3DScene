@@ -4,7 +4,7 @@
 EntityTreeItem::EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeWidget *widget, const QStringList& name, int type)
     : QTreeWidgetItem(widget, name, type)
     , entity(entity)
-    , componentsSetting(new ComponentsSettingWidget(this))
+    , componentsSetting(new ComponentsSettingPage(this))
 {
     setup();
 }
@@ -12,7 +12,7 @@ EntityTreeItem::EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeWidget *widg
 EntityTreeItem::EntityTreeItem(Qt3DCore::QEntity *entity, EntityTreeItem *item, const QStringList& name, int type)
     : QTreeWidgetItem(item, name, type)
     , entity(entity)
-    , componentsSetting(new ComponentsSettingWidget(this))
+    , componentsSetting(new ComponentsSettingPage(this))
 {
     setup();
 }
@@ -261,49 +261,49 @@ void SceneManager::createNewEntity(ECStruct::EntitySet entityEnum)
     }
     case ECStruct::EntitySet::Cone:
     {
-        components << ECStruct::ComponentsSet::Cone
+        components << ECStruct::ComponentsSet::ConeMesh
                    << ECStruct::ComponentsSet::PhongMaterial
                    << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Cuboid:
     {
-        components << ECStruct::ComponentsSet::Cuboid
+        components << ECStruct::ComponentsSet::CuboidMesh
                    << ECStruct::ComponentsSet::PhongMaterial
                    << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Cylinder:
     {
-        components << ECStruct::ComponentsSet::Cylinder
+        components << ECStruct::ComponentsSet::CylinderMesh
                    << ECStruct::ComponentsSet::PhongMaterial
                    << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::ExtrudedText:
     {
-        components << ECStruct::ComponentsSet::ExtrudedText
+        components << ECStruct::ComponentsSet::ExtrudedTextMesh
                    << ECStruct::ComponentsSet::PhongMaterial
                    << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Plane:
     {
-        components << ECStruct::ComponentsSet::Plane
+        components << ECStruct::ComponentsSet::PlaneMesh
                    << ECStruct::ComponentsSet::PhongMaterial
                    << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Sphere:
     {
-        components << ECStruct::ComponentsSet::Sphere
+        components << ECStruct::ComponentsSet::SphereMesh
                    << ECStruct::ComponentsSet::PhongMaterial
                    << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Torus:
     {
-        components << ECStruct::ComponentsSet::Torus
+        components << ECStruct::ComponentsSet::TorusMesh
                    << ECStruct::ComponentsSet::PhongMaterial
                    << ECStruct::ComponentsSet::Transform;
         break;

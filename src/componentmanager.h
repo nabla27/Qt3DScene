@@ -35,7 +35,7 @@ class ComponentListItem : public QObject, public QListWidgetItem
 {
     Q_OBJECT
 public:
-    explicit ComponentListItem(Qt3DCore::QComponent *component, const QString& name, ComponentsListWidget *widget);
+    explicit ComponentListItem(Qt3DCore::QComponent *component, ComponentsListWidget *widget);
 
 public:
     void update();
@@ -49,9 +49,6 @@ class ComponentsListWidget : public QListWidget
     Q_OBJECT
 public:
     explicit ComponentsListWidget(QWidget *parent);
-
-public slots:
-    void addComponentToList(Qt3DCore::QComponent *component, const ECStruct::ComponentsSet c);
 
 private slots:
     void receiveChangedItem(QListWidgetItem *item);
@@ -88,11 +85,11 @@ signals:
 #include <QScrollArea>
 #include <QSplitter>
 #include "settingwidget/abstractcomponentssettingwidget.h"
-class ComponentsSettingWidget : public QWidget
+class ComponentsSettingPage : public QWidget
 {
     Q_OBJECT
 public:
-    ComponentsSettingWidget(EntityTreeItem *entityItem);
+    ComponentsSettingPage(EntityTreeItem *entityItem);
 
 public slots:
     void createComponent(const ECStruct::ComponentsSet c);
@@ -102,20 +99,25 @@ private slots:
     void receiveItemChanging();
     void setEntityName(const QString& name);
     void setEntityEnable(const bool checked);
-    void removeComponent(Qt3DCore::QComponent *component);
+    void removeComponent(Qt3DCore::QComponent *const component);
+    void setCloneWidget(AbstractComponentsSettingWidget *w);
+    void addClonedComponent();
 
 private:
     void setupLayout();
 
     void createMaterialComponent(const ECStruct::ComponentsSet c);
     void createMeshComponent(const ECStruct::ComponentsSet c);
-    void addComponent(Qt3DCore::QComponent *component, const ECStruct::ComponentsSet c, AbstractComponentsSettingWidget *w);
+    void addComponent(Qt3DCore::QComponent *const component, AbstractComponentsSettingWidget *w);
 
 private:
     EntityTreeItem *entityItem;
+    static AbstractComponentsSettingWidget *cloneTarget;
 
     ComponentsMenu *componentsMenu;
 
+    QAction *addComponentsAction;
+    QAction *addClonedCompAction;
     QLineEdit *entityNameEdit;
     QCheckBox *entityEnableCheck;
 

@@ -9,6 +9,8 @@ class TransformWidget : public AbstractComponentsSettingWidget
 public:
     explicit TransformWidget(Qt3DCore::QTransform *transform, QWidget *parent);
 
+    AbstractComponentsSettingWidget *const clone() const override;
+
 protected:
     void setupContentsLayout();
 

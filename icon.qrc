@@ -3,5 +3,8 @@
         <file alias="plus">icon/icon_plus.png</file>
         <file alias="play">icon/icon_play.png</file>
         <file alias="sort">icon/icon_sort.png</file>
+        <file alias="clone">icon/icon_clone.png</file>
+        <file alias="trash-can">icon/icon_trash-can.png</file>
+        <file alias="import">icon/icon_import.png</file>
     </qresource>
 </RCC>

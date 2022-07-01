@@ -4,14 +4,16 @@
 #include <QToolBar>
 #include <QLabel>
 #include <Qt3DCore/QComponent>
+#include "../scenemanager.h"
 
 class AbstractComponentsSettingWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AbstractComponentsSettingWidget(Qt3DCore::QComponent *component, const QString& name, QWidget *parent);
+    explicit AbstractComponentsSettingWidget(Qt3DCore::QComponent *const component, const QString& name, QWidget *parent);
 
-    const Qt3DCore::QComponent *const component() const { return targetComponent; }
+    Qt3DCore::QComponent *const component() const { return targetComponent; }
+    virtual AbstractComponentsSettingWidget *const clone() const = 0;
 
 protected:
     QWidget *contents;
@@ -19,15 +21,23 @@ protected:
 private slots:
     void expandContents();
     void contractContents();
+    void requestRemove();
+    void requestClone();
 
 private:
-    Qt3DCore::QComponent *targetComponent;
+    Qt3DCore::QComponent *const targetComponent;
 
     QToolBar *toolBar;
     QLabel *label;
 
     QAction *expandAction;
     QAction *contractAction;
+    QAction *cloneAction;
+    QAction *removeAction;
+
+signals:
+    void cloneRequested(AbstractComponentsSettingWidget *w);
+    void removeRequested(Qt3DCore::QComponent *comp);
 };
 
 #endif // ABSTRACT_COMPONENTS_SETTING_WIDGET_H

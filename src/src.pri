@@ -4,6 +4,7 @@ SUBDIRS += Qt3DScene.pro
 HEADERS += $$PWD/mainwindow.h \
     $$PWD/3dwindow.h \
     $$PWD/componentmanager.h \
+    $$PWD/ecstruct.h \
     $$PWD/scenemanager.h \
     $$PWD/utility.h
 

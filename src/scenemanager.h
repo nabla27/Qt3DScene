@@ -5,63 +5,11 @@
 #include <QTreeWidget>
 
 #include "utility.h"
-
-
-
-struct ECStruct : public QObject
-{
-    Q_OBJECT
-
-public:
-    static constexpr int enumStride = 100;
-    static constexpr int enumOffset = 1000;
-    enum class EntityType { Empty, Object2D, Object3D, Camera };
-    enum class EntitySet
-    {
-        /* Empty */
-        Empty = 1000,
-
-        /* Object2D */
-        Text2D = 1100, Line,
-
-        /* Object3D */
-        Cone = 1200, Cuboid, Cylinder, ExtrudedText, Plane, Sphere, Torus,
-
-        /* Camera */
-        FirstPersonCamera = 1300, OrbitCamera,
-    };
-
-    enum class ComponentType { Transform, Material, Mesh };
-    enum class ComponentsSet
-    {
-        /* Transform */
-        Transform = 1000,
-
-        /* Material */
-        DiffuseMapMaterial = 1100, DiffuseSpecularMapMaterial, DiffuseSpecularMaterial, GoochMaterial, MetalRougthMaterial, MorphPhongMaterial,
-        NormalDiffuseMapMaterial, NormalDiffuseSpecularMapMaterial, PerVertexColorMaterial, PhongAlphaMaterial, PhongMaterial, TextureMaterial,
-
-        /* Mesh */
-        Cone = 1200, Cuboid, Cylinder, ExtrudedText, Plane, Sphere, Torus,
-    };
-
-
-    Q_ENUM(EntityType)
-    Q_ENUM(EntitySet)
-    Q_ENUM(ComponentType)
-    Q_ENUM(ComponentsSet)
-};
-
-
-
-
-
-
-
+#include "ecstruct.h"
 
 
 class EntityTreeWidget;
-class ComponentsSettingWidget;
+class ComponentsSettingPage;
 
 class EntityTreeItem : public QObject, public QTreeWidgetItem
 {
@@ -79,7 +27,7 @@ private:
 
 public:
     Qt3DCore::QEntity *entity;
-    ComponentsSettingWidget *componentsSetting;
+    ComponentsSettingPage *componentsSetting;
 
 signals:
     void itemChanged();

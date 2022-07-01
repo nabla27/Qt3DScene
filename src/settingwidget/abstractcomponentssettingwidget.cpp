@@ -10,8 +10,10 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     , targetComponent(component)
     , toolBar(new QToolBar(this))
     , label(new QLabel(name, toolBar))
-    , expandAction(new QAction(QIcon(QPixmap(":icon/play")), "expand"))
-    , contractAction(new QAction(QIcon(QPixmap(":/icon/sort")), "contract"))
+    , expandAction(new QAction(QIcon(QPixmap(":icon/play")), "expand", toolBar))
+    , contractAction(new QAction(QIcon(QPixmap(":/icon/sort")), "contract", toolBar))
+    , cloneAction(new QAction(QIcon(QPixmap(":/icon/clone")), "clone", toolBar))
+    , removeAction(new QAction(QIcon(QPixmap(":/icon/trash-can")), "remove", toolBar))
 {
     QVBoxLayout *vLayout = new QVBoxLayout(this);
 
@@ -20,6 +22,8 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     vLayout->addWidget(contents);
     toolBar->addAction(contractAction);
     toolBar->addWidget(label);
+    toolBar->addAction(cloneAction);
+    toolBar->addAction(removeAction);
 
     vLayout->setAlignment(Qt::AlignmentFlag::AlignTop);
     toolBar->setIconSize(QSize(15, 15));
@@ -31,6 +35,8 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
 
     connect(expandAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::expandContents);
     connect(contractAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::contractContents);
+    connect(cloneAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::requestClone);
+    connect(removeAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::requestRemove);
 }
 
 void AbstractComponentsSettingWidget::expandContents()
@@ -45,4 +51,14 @@ void AbstractComponentsSettingWidget::contractContents()
     contents->hide();
     toolBar->insertAction(contractAction, expandAction);
     toolBar->removeAction(contractAction);
+}
+
+void AbstractComponentsSettingWidget::requestRemove()
+{
+    emit removeRequested(targetComponent);
+}
+
+void AbstractComponentsSettingWidget::requestClone()
+{
+    emit cloneRequested(this);
 }

@@ -48,8 +48,8 @@ ComponentsMenu::ComponentsMenu(QWidget *parent)
 
 
 #include <Qt3DCore/QComponent>
-ComponentListItem::ComponentListItem(Qt3DCore::QComponent *component, const QString& name, ComponentsListWidget *widget)
-    : QListWidgetItem(name, widget)
+ComponentListItem::ComponentListItem(Qt3DCore::QComponent *component, ComponentsListWidget *widget)
+    : QListWidgetItem(component->objectName(), widget)
     , component(component)
 {
     setCheckState(Qt::CheckState::Checked);
@@ -74,10 +74,10 @@ ComponentsListWidget::ComponentsListWidget(QWidget *parent)
     connect(this, &ComponentsListWidget::itemChanged, this, &ComponentsListWidget::receiveChangedItem);
 }
 
-void ComponentsListWidget::addComponentToList(Qt3DCore::QComponent *component, const ECStruct::ComponentsSet c)
-{
-    addItem(new ComponentListItem(component, enumToString(c), this));
-}
+//void ComponentsListWidget::addComponentToList(Qt3DCore::QComponent *component, const ECStruct::ComponentsSet c)
+//{
+//    addItem(new ComponentListItem(component, enumToString(c), this));
+//}
 
 void ComponentsListWidget::receiveChangedItem(QListWidgetItem *item)
 {
@@ -120,10 +120,14 @@ void ComponentsListWidget::setupContextMenu()
 
 
 #include <QToolBar>
-ComponentsSettingWidget::ComponentsSettingWidget(EntityTreeItem *entityItem)
+AbstractComponentsSettingWidget* ComponentsSettingPage::cloneTarget = nullptr;
+
+ComponentsSettingPage::ComponentsSettingPage(EntityTreeItem *entityItem)
     : QWidget(nullptr)
     , entityItem(entityItem)
     , componentsMenu(new ComponentsMenu(this))
+    , addComponentsAction(new QAction(QIcon(QPixmap(":/icon/plus")), "Add component"))
+    , addClonedCompAction(new QAction(QIcon(QPixmap(":/icon/import")), "Add cloned component"))
     , entityNameEdit(new QLineEdit(this))
     , entityEnableCheck(new QCheckBox(this))
     , splitter(new QSplitter(Qt::Orientation::Vertical, this))
@@ -134,23 +138,26 @@ ComponentsSettingWidget::ComponentsSettingWidget(EntityTreeItem *entityItem)
 {
     setupLayout();
 
-    connect(componentsMenu, &ComponentsMenu::selected, this, &ComponentsSettingWidget::createComponent);
-    connect(entityItem, &EntityTreeItem::itemChanged, this, &ComponentsSettingWidget::receiveItemChanging);
-    connect(entityNameEdit, &QLineEdit::textChanged, this, &ComponentsSettingWidget::setEntityName);
-    connect(entityEnableCheck, &QCheckBox::toggled, this, &ComponentsSettingWidget::setEntityEnable);
-    connect(componentsListWidget, &ComponentsListWidget::removeComponentRequested, this, &ComponentsSettingWidget::removeComponent);
+    connect(componentsMenu, &ComponentsMenu::selected, this, &ComponentsSettingPage::createComponent);
+    connect(entityItem, &EntityTreeItem::itemChanged, this, &ComponentsSettingPage::receiveItemChanging);
+    connect(addComponentsAction, &QAction::triggered, this, &ComponentsSettingPage::showComponentsMenu);
+    connect(addClonedCompAction, &QAction::triggered, this, &ComponentsSettingPage::addClonedComponent);
+    connect(entityNameEdit, &QLineEdit::textChanged, this, &ComponentsSettingPage::setEntityName);
+    connect(entityEnableCheck, &QCheckBox::toggled, this, &ComponentsSettingPage::setEntityEnable);
+    connect(componentsListWidget, &ComponentsListWidget::removeComponentRequested, this, &ComponentsSettingPage::removeComponent);
 }
 
-void ComponentsSettingWidget::setupLayout()
+void ComponentsSettingPage::setupLayout()
 {
     QVBoxLayout *vLayout = new QVBoxLayout(this);
     QToolBar *toolBar = new QToolBar(this);
 
     setLayout(vLayout);
     vLayout->addWidget(toolBar);
-    QAction *addComponentsAction = toolBar->addAction(QIcon(QPixmap(":/icon/plus")), "Add component");
+    toolBar->addAction(addComponentsAction);
     toolBar->addWidget(entityNameEdit);
     toolBar->addWidget(entityEnableCheck);
+    toolBar->addAction(addClonedCompAction);
     vLayout->addWidget(splitter);
     splitter->addWidget(componentsListWidget);
     splitter->addWidget(scrollArea);
@@ -172,33 +179,31 @@ void ComponentsSettingWidget::setupLayout()
     contentsArea->setContentsMargins(0, 0, 0, 0);
     contentsLayout->setSpacing(0);
     contentsLayout->setContentsMargins(0, 0, 0, 0);
-
-    connect(addComponentsAction, &QAction::triggered, this, &ComponentsSettingWidget::showComponentsMenu);
 }
 
-void ComponentsSettingWidget::showComponentsMenu()
+void ComponentsSettingPage::showComponentsMenu()
 {
     componentsMenu->exec(cursor().pos());
 }
 
-void ComponentsSettingWidget::receiveItemChanging()
+void ComponentsSettingPage::receiveItemChanging()
 {
     entityEnableCheck->setCheckState(entityItem->checkState(0));
     entityNameEdit->setText(entityItem->text(0));
 }
 
-void ComponentsSettingWidget::setEntityName(const QString& name)
+void ComponentsSettingPage::setEntityName(const QString& name)
 {
     entityItem->setText(0, name);
 }
 
-void ComponentsSettingWidget::setEntityEnable(const bool checked)
+void ComponentsSettingPage::setEntityEnable(const bool checked)
 {
     entityItem->entity->setEnabled(checked);
     entityItem->setCheckState(0, (checked) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
-void ComponentsSettingWidget::removeComponent(Qt3DCore::QComponent *component)
+void ComponentsSettingPage::removeComponent(Qt3DCore::QComponent *const component)
 {
     entityItem->entity->removeComponent(component);
     if(component->entities().count() == 0) delete component;  //複数のEntity間で共有されている場合がある。
@@ -213,19 +218,39 @@ void ComponentsSettingWidget::removeComponent(Qt3DCore::QComponent *component)
     }
 }
 
-void ComponentsSettingWidget::addComponent(Qt3DCore::QComponent *component, const ECStruct::ComponentsSet c, AbstractComponentsSettingWidget *w)
+void ComponentsSettingPage::addComponent(Qt3DCore::QComponent *const component, AbstractComponentsSettingWidget *w)
 {
     entityItem->entity->addComponent(component);
-    componentsListWidget->addComponentToList(component, c);
+    ComponentListItem *listItem = new ComponentListItem(component, componentsListWidget);
+    componentsListWidget->addItem(listItem);
+    component->setShareable(true);
+
     if(w)
     {
         contentsList.append(w);
         contentsLayout->addWidget(w);
+
+        connect(w, &AbstractComponentsSettingWidget::cloneRequested, this, &ComponentsSettingPage::setCloneWidget);
+        connect(w, &AbstractComponentsSettingWidget::destroyed, listItem, &ComponentListItem::deleteLater);
+        connect(w, &AbstractComponentsSettingWidget::removeRequested, this, &ComponentsSettingPage::removeComponent);
     }
 }
 
+void ComponentsSettingPage::setCloneWidget(AbstractComponentsSettingWidget *w)
+{
+    if(w) cloneTarget = w;
+}
+
+void ComponentsSettingPage::addClonedComponent()
+{
+    if(cloneTarget)
+        if(AbstractComponentsSettingWidget *clone = cloneTarget->clone())
+            addComponent(clone->component(), clone);
+}
+
+
 #include "settingwidget/transformwidget.h"
-void ComponentsSettingWidget::createComponent(const ECStruct::ComponentsSet c)
+void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
 {
     const ECStruct::ComponentType componentType = ECStruct::ComponentType(((int)c - ECStruct::enumOffset) / ECStruct::enumStride);
 
@@ -235,7 +260,8 @@ void ComponentsSettingWidget::createComponent(const ECStruct::ComponentsSet c)
     {
         Qt3DCore::QTransform *transform = new Qt3DCore::QTransform(entityItem->entity);
         TransformWidget *w = new TransformWidget(transform, contentsArea);
-        addComponent(transform, c, w);
+        transform->setObjectName("Transform");
+        addComponent(transform, w);
         return;
     }
     case ECStruct::ComponentType::Material:
@@ -265,7 +291,7 @@ void ComponentsSettingWidget::createComponent(const ECStruct::ComponentsSet c)
 #include <Qt3DExtras/QPhongAlphaMaterial>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DExtras/QTextureMaterial>
-void ComponentsSettingWidget::createMaterialComponent(const ECStruct::ComponentsSet c)
+void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSet c)
 {
     Qt3DCore::QComponent *material = nullptr;
     AbstractComponentsSettingWidget *widget = nullptr;
@@ -336,7 +362,8 @@ void ComponentsSettingWidget::createMaterialComponent(const ECStruct::Components
         return;
     }
 
-    addComponent(material, c, widget);
+    material->setObjectName(enumToString(c));
+    addComponent(material, widget);
 }
 
 #include <Qt3DExtras/QConeMesh>
@@ -346,44 +373,45 @@ void ComponentsSettingWidget::createMaterialComponent(const ECStruct::Components
 #include <Qt3DExtras/QPlaneMesh>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QTorusMesh>
-void ComponentsSettingWidget::createMeshComponent(const ECStruct::ComponentsSet c)
+#include "ecstruct.h"
+void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
 {
     Qt3DCore::QComponent *mesh = nullptr;
     AbstractComponentsSettingWidget *widget = nullptr;
 
     switch(c)
     {
-    case ECStruct::ComponentsSet::Cone:
+    case ECStruct::ComponentsSet::ConeMesh:
     {
         mesh = new Qt3DExtras::QConeMesh(entityItem->entity);
         break;
     }
-    case ECStruct::ComponentsSet::Cuboid:
+    case ECStruct::ComponentsSet::CuboidMesh:
     {
         mesh = new Qt3DExtras::QCuboidMesh(entityItem->entity);
         break;
     }
-    case ECStruct::ComponentsSet::Cylinder:
+    case ECStruct::ComponentsSet::CylinderMesh:
     {
         mesh = new Qt3DExtras::QCylinderMesh(entityItem->entity);
         break;
     }
-    case ECStruct::ComponentsSet::ExtrudedText:
+    case ECStruct::ComponentsSet::ExtrudedTextMesh:
     {
         mesh = new Qt3DExtras::QExtrudedTextMesh(entityItem->entity);
         break;
     }
-    case ECStruct::ComponentsSet::Plane:
+    case ECStruct::ComponentsSet::PlaneMesh:
     {
         mesh = new Qt3DExtras::QPlaneMesh(entityItem->entity);
         break;
     }
-    case ECStruct::ComponentsSet::Sphere:
+    case ECStruct::ComponentsSet::SphereMesh:
     {
         mesh = new Qt3DExtras::QSphereMesh(entityItem->entity);
         break;
     }
-    case ECStruct::ComponentsSet::Torus:
+    case ECStruct::ComponentsSet::TorusMesh:
     {
         mesh = new Qt3DExtras::QTorusMesh(entityItem->entity);
         break;
@@ -392,7 +420,8 @@ void ComponentsSettingWidget::createMeshComponent(const ECStruct::ComponentsSet 
         return;
     }
 
-    addComponent(mesh, c, widget);
+    mesh->setObjectName(enumToString(c));
+    addComponent(mesh, widget);
 }
 
 

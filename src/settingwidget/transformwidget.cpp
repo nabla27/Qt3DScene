@@ -39,3 +39,8 @@ void TransformWidget::setupContentsLayout()
     connect(scale3dSpinBox, &Form3DDoubleSpin::valueChanged, transform, &Qt3DCore::QTransform::setScale3D);
     connect(scaleSpinBox, &QDoubleSpinBox::valueChanged, transform, &Qt3DCore::QTransform::setScale);
 }
+
+AbstractComponentsSettingWidget *const TransformWidget::clone() const
+{
+    return new TransformWidget(transform, parentWidget());
+}
