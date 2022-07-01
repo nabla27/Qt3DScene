@@ -202,7 +202,10 @@ void ComponentsSettingPage::setEntityEnable(const bool checked)
 void ComponentsSettingPage::removeComponent(Qt3DCore::QComponent *const component)
 {
     entityItem->entity->removeComponent(component);
-    if(component->entities().count() == 0) delete component;  //複数のEntity間で共有されている場合がある。
+
+    /* DEBUG componentをdelete()やdeleteLayter()するとクラッシュする
+     * QTransformはクラッシュしないが，MeshやMaterialなどはクラッシュする*/
+    //if(component->entities().count() == 0) component->deleteLater();  //他のEntityでも使われていない場合
 
     for(AbstractComponentsSettingWidget *w : contentsList)
     {
@@ -285,7 +288,8 @@ void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
 #include <Qt3DExtras/QNormalDiffuseSpecularMapMaterial>
 #include <Qt3DExtras/QPerVertexColorMaterial>
 #include <Qt3DExtras/QPhongAlphaMaterial>
-#include <Qt3DExtras/QPhongMaterial>
+//#include <Qt3DExtras/QPhongMaterial>
+#include "settingwidget/materialsetting.h"
 #include <Qt3DExtras/QTextureMaterial>
 void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSet c)
 {
@@ -346,7 +350,9 @@ void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSe
     }
     case ECStruct::ComponentsSet::PhongMaterial:
     {
-        material = new Qt3DExtras::QPhongMaterial(entityItem->entity);
+        Qt3DExtras::QPhongMaterial *m = new Qt3DExtras::QPhongMaterial(entityItem->entity);
+        widget = new PhongMaterialSettingWidget(m, contentsArea);
+        material = m;
         break;
     }
     case ECStruct::ComponentsSet::TextureMaterial:

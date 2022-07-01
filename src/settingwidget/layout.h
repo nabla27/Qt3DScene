@@ -41,4 +41,30 @@ signals:
 };
 
 
+
+
+
+
+#include <QPushButton>
+#include <QColorDialog>
+class ColorDialogButton : public QPushButton
+{
+    Q_OBJECT
+public:
+    explicit ColorDialogButton(const QString& text, QWidget *parent);
+
+public slots:
+    void setColor(const QColor& color);
+
+private slots:
+    void setButtonColor(const QColor& color);
+
+private:
+    QColorDialog *colorDialog;
+
+signals:
+    void colorChanged(const QColor& color);
+};
+
+
 #endif // LAYOUT_H

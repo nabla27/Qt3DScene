@@ -43,3 +43,47 @@ void Form3DDoubleSpin::emitChangedValue()
 {
     emit valueChanged(QVector3D(xSpinBox->value(), ySpinBox->value(), zSpinBox->value()));
 }
+
+
+
+
+
+
+
+
+
+
+ColorDialogButton::ColorDialogButton(const QString& text, QWidget *parent)
+    : QPushButton(text, parent)
+    , colorDialog(new QColorDialog(parent))
+{
+    connect(this, &ColorDialogButton::released, colorDialog, &QColorDialog::show);
+    connect(colorDialog, &QColorDialog::currentColorChanged, this, &ColorDialogButton::setButtonColor);
+    connect(colorDialog, &QColorDialog::currentColorChanged, this, &ColorDialogButton::colorChanged);
+}
+
+void ColorDialogButton::setColor(const QColor& color)
+{
+    colorDialog->setCurrentColor(color);
+}
+
+void ColorDialogButton::setButtonColor(const QColor& color)
+{
+    const QString colorName = color.name();
+    setStyleSheet(QString("QPushButton { background: %1 }").arg(colorName));
+    setText(colorName);
+    setToolTip(colorName);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
