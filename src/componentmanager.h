@@ -50,6 +50,9 @@ class ComponentsListWidget : public QListWidget
 public:
     explicit ComponentsListWidget(QWidget *parent);
 
+    QSize minimumSizeHint() const override { return QSize(0, 0); }
+    QSize sizeHint() const override { return QSize(250, 50); }
+
 private slots:
     void receiveChangedItem(QListWidgetItem *item);
     void emitRemoveRequest();

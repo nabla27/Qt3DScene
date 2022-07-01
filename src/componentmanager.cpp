@@ -162,6 +162,7 @@ void ComponentsSettingPage::setupLayout()
     vLayout->setAlignment(Qt::AlignmentFlag::AlignTop);
     toolBar->setIconSize(QSize(15, 15));
     entityNameEdit->setFixedHeight(20);
+    scrollArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     scrollArea->setWidgetResizable(true);
     contentsLayout->setAlignment(Qt::AlignmentFlag::AlignTop);
 
