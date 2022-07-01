@@ -235,6 +235,7 @@ void SceneManager::emitSelectedEntity(QTreeWidgetItem *item, int column)
 void SceneManager::createNewEntity(ECStruct::EntitySet entityEnum)
 {
     Qt3DCore::QEntity *entity = nullptr;
+    QList<ECStruct::ComponentsSet> components;
 
     switch(entityEnum)
     {
@@ -242,82 +243,71 @@ void SceneManager::createNewEntity(ECStruct::EntitySet entityEnum)
     {
         break;
     }
-
     case ECStruct::EntitySet::Text2D:
     {
         Qt3DExtras::QText2DEntity *text2dEntity = new Qt3DExtras::QText2DEntity();
-        text2dEntity->addComponent(new Qt3DCore::QTransform(entity));
         text2dEntity->setText("Text 2D");
         text2dEntity->setWidth(100.0f);
         text2dEntity->setHeight(20.0f);
         text2dEntity->setColor(Qt::black);
         entity = text2dEntity;
+
+        components << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Line:
     {
         break;
     }
-
     case ECStruct::EntitySet::Cone:
     {
-        entity = new Qt3DCore::QEntity;
-        entity->addComponent(new Qt3DExtras::QConeMesh(entity));
-        entity->addComponent(new Qt3DExtras::QPhongMaterial(entity));
-        entity->addComponent(new Qt3DCore::QTransform(entity));
+        components << ECStruct::ComponentsSet::Cone
+                   << ECStruct::ComponentsSet::PhongMaterial
+                   << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Cuboid:
     {
-        entity = new Qt3DCore::QEntity;
-        entity->addComponent(new Qt3DExtras::QCuboidMesh(entity));
-        entity->addComponent(new Qt3DExtras::QPhongMaterial(entity));
-        entity->addComponent(new Qt3DCore::QTransform(entity));
+        components << ECStruct::ComponentsSet::Cuboid
+                   << ECStruct::ComponentsSet::PhongMaterial
+                   << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Cylinder:
     {
-        entity = new Qt3DCore::QEntity;
-        entity->addComponent(new Qt3DExtras::QCylinderMesh(entity));
-        entity->addComponent(new Qt3DExtras::QPhongMaterial(entity));
-        entity->addComponent(new Qt3DCore::QTransform(entity));
+        components << ECStruct::ComponentsSet::Cylinder
+                   << ECStruct::ComponentsSet::PhongMaterial
+                   << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::ExtrudedText:
     {
-        entity = new Qt3DCore::QEntity;
-        Qt3DExtras::QExtrudedTextMesh *mesh = new Qt3DExtras::QExtrudedTextMesh(entity);
-        entity->addComponent(mesh);
-        mesh->setText("Extruded Text");
-        entity->addComponent(new Qt3DExtras::QPhongMaterial(entity));
-        entity->addComponent(new Qt3DCore::QTransform(entity));
+        components << ECStruct::ComponentsSet::ExtrudedText
+                   << ECStruct::ComponentsSet::PhongMaterial
+                   << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Plane:
     {
-        entity = new Qt3DCore::QEntity;
-        entity->addComponent(new Qt3DExtras::QPlaneMesh(entity));
-        entity->addComponent(new Qt3DExtras::QPhongMaterial(entity));
-        entity->addComponent(new Qt3DCore::QTransform(entity));
+        components << ECStruct::ComponentsSet::Plane
+                   << ECStruct::ComponentsSet::PhongMaterial
+                   << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Sphere:
     {
-        entity = new Qt3DCore::QEntity;
-        entity->addComponent(new Qt3DExtras::QSphereMesh(entity));
-        entity->addComponent(new Qt3DExtras::QPhongMaterial(entity));
-        entity->addComponent(new Qt3DCore::QTransform(entity));
+        components << ECStruct::ComponentsSet::Sphere
+                   << ECStruct::ComponentsSet::PhongMaterial
+                   << ECStruct::ComponentsSet::Transform;
         break;
     }
     case ECStruct::EntitySet::Torus:
     {
-        entity = new Qt3DCore::QEntity;
-        entity->addComponent(new Qt3DExtras::QTorusMesh(entity));
-        entity->addComponent(new Qt3DExtras::QPhongMaterial(entity));
-        entity->addComponent(new Qt3DCore::QTransform(entity));
+        components << ECStruct::ComponentsSet::Torus
+                   << ECStruct::ComponentsSet::PhongMaterial
+                   << ECStruct::ComponentsSet::Transform;
         break;
     }
-
     case ECStruct::EntitySet::FirstPersonCamera:
     {
         break;
@@ -326,12 +316,12 @@ void SceneManager::createNewEntity(ECStruct::EntitySet entityEnum)
     {
         break;
     }
-
     default:
-        break;
+        return;
     }
 
-    if(!entity) return;
+    if(!entity)
+        entity = new Qt3DCore::QEntity;
 
 
     EntityTreeItem *entityTreeItem;
@@ -348,6 +338,9 @@ void SceneManager::createNewEntity(ECStruct::EntitySet entityEnum)
         entityTree->addTopLevelItem(entityTreeItem);
         emit topLevelEntityCreated(entity);
     }
+
+    for(const ECStruct::ComponentsSet& c : components)
+        entityTreeItem->componentsSetting->createComponent(c);
 }
 
 

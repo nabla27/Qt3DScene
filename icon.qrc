@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/icon">
         <file alias="plus">icon/icon_plus.png</file>
+        <file alias="play">icon/icon_play.png</file>
+        <file alias="sort">icon/icon_sort.png</file>
     </qresource>
 </RCC>

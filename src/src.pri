@@ -14,3 +14,5 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/scenemanager.cpp
 
 RESOURCES +=
+
+include(settingwidget/settingwidget.pri)
