@@ -74,11 +74,6 @@ ComponentsListWidget::ComponentsListWidget(QWidget *parent)
     connect(this, &ComponentsListWidget::itemChanged, this, &ComponentsListWidget::receiveChangedItem);
 }
 
-//void ComponentsListWidget::addComponentToList(Qt3DCore::QComponent *component, const ECStruct::ComponentsSet c)
-//{
-//    addItem(new ComponentListItem(component, enumToString(c), this));
-//}
-
 void ComponentsListWidget::receiveChangedItem(QListWidgetItem *item)
 {
     static_cast<ComponentListItem*>(item)->update();
@@ -249,7 +244,7 @@ void ComponentsSettingPage::addClonedComponent()
 }
 
 
-#include "settingwidget/transformwidget.h"
+#include "settingwidget/transformsetting.h"
 void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
 {
     const ECStruct::ComponentType componentType = ECStruct::ComponentType(((int)c - ECStruct::enumOffset) / ECStruct::enumStride);
@@ -366,7 +361,8 @@ void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSe
     addComponent(material, widget);
 }
 
-#include <Qt3DExtras/QConeMesh>
+//#include <Qt3DExtras/QConeMesh>
+#include "settingwidget/meshsetting.h"
 #include <Qt3DExtras/QCuboidMesh>
 #include <Qt3DExtras/QCylinderMesh>
 #include <Qt3DExtras/QExtrudedTextMesh>
@@ -383,7 +379,9 @@ void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
     {
     case ECStruct::ComponentsSet::ConeMesh:
     {
-        mesh = new Qt3DExtras::QConeMesh(entityItem->entity);
+        Qt3DExtras::QConeMesh *cone = new Qt3DExtras::QConeMesh(entityItem->entity);
+        widget = new ConeMeshSettingWidget(cone, contentsArea);
+        mesh = cone;
         break;
     }
     case ECStruct::ComponentsSet::CuboidMesh:
