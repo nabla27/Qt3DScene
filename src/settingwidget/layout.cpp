@@ -39,6 +39,20 @@ Form3DDoubleSpin::Form3DDoubleSpin(QWidget *parent)
     connect(zSpinBox, &QDoubleSpinBox::valueChanged, this, &Form3DDoubleSpin::emitChangedValue);
 }
 
+void Form3DDoubleSpin::setMinimum(const double &min)
+{
+    xSpinBox->setMinimum(min);
+    ySpinBox->setMinimum(min);
+    zSpinBox->setMinimum(min);
+}
+
+void Form3DDoubleSpin::setMaximum(const double &max)
+{
+    xSpinBox->setMaximum(max);
+    ySpinBox->setMaximum(max);
+    zSpinBox->setMaximum(max);
+}
+
 void Form3DDoubleSpin::emitChangedValue()
 {
     emit valueChanged(QVector3D(xSpinBox->value(), ySpinBox->value(), zSpinBox->value()));

@@ -25,6 +25,14 @@ void TransformWidget::setupContentsLayout()
     fLayout->addRow("Scale3D", scale3dSpinBox);
     fLayout->addRow("Scale", scaleSpinBox);
 
+    constexpr double range = 100000;
+    positionSpinBox->setMinimum(-range);
+    rotationSpinBox->setMinimum(-range);
+    positionSpinBox->setMaximum(range);
+    rotationSpinBox->setMaximum(range);
+    scale3dSpinBox->setMaximum(range);
+    scaleSpinBox->setMaximum(range);
+
     connect(transform, &Qt3DCore::QTransform::translationChanged, positionSpinBox, &Form3DDoubleSpin::setValue);
     connect(transform, &Qt3DCore::QTransform::rotationXChanged, rotationSpinBox, &Form3DDoubleSpin::setXValue);
     connect(transform, &Qt3DCore::QTransform::rotationYChanged, rotationSpinBox, &Form3DDoubleSpin::setYValue);
@@ -38,6 +46,11 @@ void TransformWidget::setupContentsLayout()
     connect(rotationSpinBox, &Form3DDoubleSpin::zValueChanged, transform, &Qt3DCore::QTransform::setRotationZ);
     connect(scale3dSpinBox, &Form3DDoubleSpin::valueChanged, transform, &Qt3DCore::QTransform::setScale3D);
     connect(scaleSpinBox, &QDoubleSpinBox::valueChanged, transform, &Qt3DCore::QTransform::setScale);
+
+    positionSpinBox->setValue(transform->translation());
+    rotationSpinBox->setValue(transform->rotation().vector());
+    scale3dSpinBox->setValue(transform->scale3D());
+    scaleSpinBox->setValue(transform->scale());
 }
 
 AbstractComponentsSettingWidget *const TransformWidget::clone() const

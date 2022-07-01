@@ -10,6 +10,11 @@ class Form3DDoubleSpin : public QWidget
 public:
     explicit Form3DDoubleSpin(QWidget *parent);
 
+public:
+    void setMinimum(const double& min);
+    void setMaximum(const double& max);
+    QVector3D value() const { return QVector3D(xSpinBox->value(), ySpinBox->value(), zSpinBox->value()); }
+
 public slots:
     void setXValue(const double& x) { xSpinBox->setValue(x); }
     void setYValue(const double& y) { ySpinBox->setValue(y); }
