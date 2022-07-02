@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QStyle>
+#include <QSpacerItem>
 AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComponent *component, const QString& name, QWidget *parent)
     : QWidget(parent)
     , contents(new QWidget(this))
@@ -16,17 +17,24 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     , removeAction(new QAction(QIcon(QPixmap(":/icon/trash-can")), "remove", toolBar))
 {
     QVBoxLayout *vLayout = new QVBoxLayout(this);
+    QLabel *spacer = new QLabel(toolBar);
 
     setLayout(vLayout);
     vLayout->addWidget(toolBar);
     vLayout->addWidget(contents);
     toolBar->addAction(contractAction);
     toolBar->addWidget(label);
+    toolBar->addWidget(spacer);
     toolBar->addAction(cloneAction);
     toolBar->addAction(removeAction);
 
     vLayout->setAlignment(Qt::AlignmentFlag::AlignTop);
     toolBar->setIconSize(QSize(15, 15));
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    QFont font = label->font();
+    font.setBold(true);
+    label->setFont(font);
 
     setContentsMargins(0, 0, 0, 0);
     vLayout->setSpacing(0);
