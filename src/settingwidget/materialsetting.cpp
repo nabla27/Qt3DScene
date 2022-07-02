@@ -6,6 +6,7 @@ AbstractMaterialSettingWidget::AbstractMaterialSettingWidget(Qt3DRender::QMateri
     , material(material)
 {
     contents->setLayout(fLayout);
+    setIcon(":/icon/3dsurface");
 }
 
 

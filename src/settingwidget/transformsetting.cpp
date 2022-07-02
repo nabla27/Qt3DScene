@@ -4,11 +4,14 @@
 
 #include <QFormLayout>
 #include "layout.h"
+
 TransformWidget::TransformWidget(Qt3DCore::QTransform *transform, QWidget *parent)
     : AbstractComponentsSettingWidget(transform, "Transform", parent)
     , transform(transform)
 {
     setupContentsLayout();
+
+    setIcon(":/icon/3dtransform");
 }
 
 void TransformWidget::setupContentsLayout()

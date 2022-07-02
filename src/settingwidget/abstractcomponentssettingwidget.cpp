@@ -1,6 +1,5 @@
 #include "abstractcomponentssettingwidget.h"
 
-
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QStyle>
@@ -10,6 +9,7 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     , contents(new QWidget(this))
     , targetComponent(component)
     , toolBar(new QToolBar(this))
+    , iconLabel(new QLabel(this))
     , label(new QLabel(name, toolBar))
     , expandAction(new QAction(QIcon(QPixmap(":icon/play")), "expand", toolBar))
     , contractAction(new QAction(QIcon(QPixmap(":/icon/sort")), "contract", toolBar))
@@ -23,13 +23,14 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     vLayout->addWidget(toolBar);
     vLayout->addWidget(contents);
     toolBar->addAction(contractAction);
+    toolBar->addWidget(iconLabel);
     toolBar->addWidget(label);
     toolBar->addWidget(spacer);
     toolBar->addAction(cloneAction);
     toolBar->addAction(removeAction);
 
     vLayout->setAlignment(Qt::AlignmentFlag::AlignTop);
-    toolBar->setIconSize(QSize(15, 15));
+    toolBar->setIconSize(QSize(iconSize, iconSize));
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     QFont font = label->font();
@@ -45,6 +46,7 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     connect(contractAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::contractContents);
     connect(cloneAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::requestClone);
     connect(removeAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::requestRemove);
+    connect(this, &AbstractComponentsSettingWidget::loadIconRequested, this, &AbstractComponentsSettingWidget::setIcon);
 }
 
 void AbstractComponentsSettingWidget::expandContents()
