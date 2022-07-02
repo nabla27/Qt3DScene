@@ -1,22 +1,8 @@
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-include(meshsetting/meshsetting.pri)
-include(materialsetting/materialsetting.pri)
-
 HEADERS += \
     $$PWD/abstractcomponentssettingwidget.h \
+    $$PWD/animationsetting.h \
     $$PWD/layout.h \
     $$PWD/materialsetting.h \
     $$PWD/meshsetting.h \
@@ -24,6 +10,7 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/abstractcomponentssettingwidget.cpp \
+    $$PWD/animationsetting.cpp \
     $$PWD/layout.cpp \
     $$PWD/materialsetting.cpp \
     $$PWD/meshsetting.cpp \

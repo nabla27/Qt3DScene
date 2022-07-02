@@ -16,4 +16,4 @@ SOURCES += $$PWD/main.cpp \
 
 RESOURCES +=
 
-include(settingwidget/settingwidget.pri)
+include(components-setting/components-setting.pri)

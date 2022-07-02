@@ -219,9 +219,9 @@ void ComponentsSettingPage::removeComponent(Qt3DCore::QComponent *const componen
 
 void ComponentsSettingPage::addComponent(Qt3DCore::QComponent *const component, AbstractComponentsSettingWidget *w)
 {
-    entityItem->entity->addComponent(component);
     ComponentListItem *listItem = new ComponentListItem(component, componentsListWidget);
     componentsListWidget->addItem(listItem);
+    entityItem->entity->addComponent(component);
     component->setShareable(true);
 
     if(w)
@@ -248,7 +248,7 @@ void ComponentsSettingPage::addClonedComponent()
 }
 
 
-#include "settingwidget/transformsetting.h"
+#include "components-setting/transformsetting.h"
 void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
 {
     const ECStruct::ComponentType componentType = ECStruct::ComponentType(((int)c - ECStruct::enumOffset) / ECStruct::enumStride);
@@ -273,6 +273,11 @@ void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
         createMeshComponent(c);
         return;
     }
+    case ECStruct::ComponentType::Animation:
+    {
+        createAnimationComponent(c);
+        return;
+    }
     default:
         return;
     }
@@ -289,7 +294,7 @@ void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
 #include <Qt3DExtras/QPerVertexColorMaterial>
 #include <Qt3DExtras/QPhongAlphaMaterial>
 //#include <Qt3DExtras/QPhongMaterial>
-#include "settingwidget/materialsetting.h"
+#include "components-setting/materialsetting.h"
 #include <Qt3DExtras/QTextureMaterial>
 void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSet c)
 {
@@ -369,7 +374,7 @@ void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSe
 }
 
 //#include <Qt3DExtras/QConeMesh>
-#include "settingwidget/meshsetting.h"
+#include "components-setting/meshsetting.h"
 #include <Qt3DExtras/QCuboidMesh>
 #include <Qt3DExtras/QCylinderMesh>
 #include <Qt3DExtras/QExtrudedTextMesh>
@@ -427,6 +432,28 @@ void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
 
     mesh->setObjectName(enumToString(c));
     addComponent(mesh, widget);
+}
+
+#include "components-setting/animationsetting.h"
+void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsSet c)
+{
+    AbstractComponentsSettingWidget *widget = nullptr;
+    Qt3DCore::QComponent *comp = nullptr;
+
+    switch(c)
+    {
+    case ECStruct::ComponentsSet::AnimationGroup:
+    {
+        comp = new Qt3DCore::QComponent(entityItem->entity);
+        widget = new AnimationGroupSettingWidget(entityItem->entity, comp, contentsArea);
+        break;
+    }
+    default:
+        return;
+    }
+
+    comp->setObjectName(enumToString(c));
+    addComponent(comp, widget);
 }
 
 

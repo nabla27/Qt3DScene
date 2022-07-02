@@ -6,25 +6,10 @@
         <file alias="clone">icon/icon_clone.png</file>
         <file alias="trash-can">icon/icon_trash-can.png</file>
         <file alias="import">icon/icon_import.png</file>
-
-        <!--
-        <a target="_blank" href="https://icons8.com/icon/46249/メッシュ">メッシュ</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-        -->
         <file alias="3dmesh">icon/icon-3dmesh.png</file>
-
-        <!--
-        <a target="_blank" href="https://icons8.com/icon/On4aj5nBxUGe/3d">3d</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-        -->
         <file alias="3dobject">icon/icon-3dobject.png</file>
-
-        <!--
-        <a target="_blank" href="https://icons8.com/icon/orzfGXhWcvyV/3d">3d</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-        -->
         <file alias="3dtransform">icon/icon-3dtransform.png</file>
-
-        <!--
-        <a target="_blank" href="https://icons8.com/icon/bJUUko17FryZ/surface">Surface</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-        -->
         <file alias="3dsurface">icon/icons-3dsurface.png</file>
+        <file alias="animation-group">icon/icon_animation-group.png</file>
     </qresource>
 </RCC>

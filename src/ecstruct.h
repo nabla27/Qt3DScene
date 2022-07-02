@@ -3,29 +3,7 @@
 
 #include <QObject>
 
-//class QComponent;
-//class QTransform;
-//
-//class QDiffuseMapMaterial;
-//class QDiffuseSpecularMapMaterial;
-//class QDiffuseSpecularMaterial;
-//class QGoochMaterial;
-//class QMetalRoughMaterial;
-//class QMorphPhongMaterial;
-//class QNormalDiffuseMapMaterial;
-//class QNormalDiffuseSpecularMapMaterial;
-//class QPerVertexColorMaterial;
-//class QPhongAlphaMateiral;
-//class QPhongMaterial;
-//class QTextureMaterial;
-//
-//class QConeMesh;
-//class QCuboidMesh;
-//class QCylinderMesh;
-//class QExtrudedTextMesh;
-//class QPlaneMesh;
-//class QSphereMesh;
-//class QTorusMesh;
+
 
 
 struct ECStruct : public QObject
@@ -51,7 +29,7 @@ public:
         FirstPersonCamera = 1300, OrbitCamera,
     };
 
-    enum class ComponentType { Transform, Material, Mesh };
+    enum class ComponentType { Transform, Material, Mesh, Animation };
     enum class ComponentsSet
     {
         /* Transform */
@@ -63,6 +41,9 @@ public:
 
         /* Mesh */
         ConeMesh = 1200, CuboidMesh, CylinderMesh, ExtrudedTextMesh, PlaneMesh, SphereMesh, TorusMesh,
+
+        /* Animation */
+        AnimationGroup = 1300,
     };
 
 
