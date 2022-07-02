@@ -11,5 +11,6 @@
         <file alias="3dtransform">icon/icon-3dtransform.png</file>
         <file alias="3dsurface">icon/icons-3dsurface.png</file>
         <file alias="animation-group">icon/icon_animation-group.png</file>
+        <file alias="gear">icon/icon_gear.png</file>
     </qresource>
 </RCC>

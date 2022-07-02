@@ -3,6 +3,8 @@
 #include "abstractcomponentssettingwidget.h"
 #include <QSequentialAnimationGroup>
 #include <Qt3DCore/QEntity>
+#include <QVBoxLayout>
+#include <QSpinBox>
 
 class AnimationGroupSettingWidget : public AbstractComponentsSettingWidget
 {
@@ -15,6 +17,13 @@ public:
 protected:
     Qt3DCore::QEntity *entity;
     QSequentialAnimationGroup *const animation;
+
+private:
+    QToolBar *controller;
+    QAction *playAction;
+    QAction *stopAction;
+    QAction *openEditorAction;
+    QSpinBox *timeSpinBox;
 };
 
 
