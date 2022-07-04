@@ -15,8 +15,11 @@ public:
 public slots:
     void setDuration(const int duration)
     {
-        _duration = duration;
-        emit durationChanged(duration);
+        if(duration != _duration)
+        {
+            _duration = duration;
+            emit durationChanged(duration);
+        }
     }
 
 protected:

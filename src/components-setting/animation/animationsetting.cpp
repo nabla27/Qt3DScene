@@ -179,7 +179,6 @@ void AnimationControllBar::setConnectionState(const AbstractAnimation::State &ne
     case AbstractAnimation::State::Stopped:
     {
         animation->disconnect(timeToSpinBox);
-        animation->disconnect(test);
         spinBoxToTime = connect(timeSpinBox, &QSpinBox::valueChanged, animation, &AbstractAnimation::setCurrentTime);
         break;
     }
@@ -193,6 +192,55 @@ void AnimationControllBar::setConnectionState(const AbstractAnimation::State &ne
         break;
     }
 }
+
+
+
+
+
+
+
+
+
+#include <QFormLayout>
+AbstractAnimationSettingWidget::AbstractAnimationSettingWidget(Qt3DCore::QComponent *target,
+                                                               AbstractAnimation *animation,
+                                                               const QString& name,
+                                                               QWidget *parent,
+                                                               const bool isSubComponent)
+    : AbstractComponentsSettingWidget(target, name, parent, isSubComponent)
+    , animation(animation)
+    , animationVLayout(new QVBoxLayout(contents))
+    , animationFLayout(new QFormLayout)
+    , controllBar(new AnimationControllBar(contents, animation))
+    , durationSpinBox(new QSpinBox(contents))
+    , loopCountSpinBox(new QSpinBox(contents))
+{
+    contents->setLayout(animationVLayout);
+    animationVLayout->addWidget(controllBar);
+    animationVLayout->addLayout(animationFLayout);
+    animationFLayout->addRow("Duration", durationSpinBox);
+    animationFLayout->addRow("Loop Count", loopCountSpinBox);
+
+    durationSpinBox->setMaximum(10000000);
+    loopCountSpinBox->setMaximum(1000000);
+
+    durationSpinBox->setValue(animation->duration());
+    loopCountSpinBox->setValue((animation->loopCount() == -1) ? 0 : animation->loopCount());
+
+    connect(durationSpinBox, &QSpinBox::valueChanged, animation, &AbstractAnimation::setDuration);
+    connect(animation, &AbstractAnimation::durationChanged, durationSpinBox, &QSpinBox::setValue);
+    connect(loopCountSpinBox, &QSpinBox::valueChanged, this, &AbstractAnimationSettingWidget::setLoopCount);
+}
+
+void AbstractAnimationSettingWidget::setLoopCount(const int value)
+{
+    if(value == 0)
+        animation->setLoopCount(-1);
+    else
+        animation->setLoopCount(value);
+}
+
+
 
 
 

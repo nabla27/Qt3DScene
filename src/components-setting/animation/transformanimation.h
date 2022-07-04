@@ -2,7 +2,6 @@
 #define TRANSFORMANIMATION_H
 
 #include "animation.h"
-#include "src/components-setting/abstractcomponentssettingwidget.h"
 #include "src/components-setting/animation/animationsetting.h"
 #include <Qt3DCore/QTransform>
 #include <QThread>
@@ -63,7 +62,7 @@ signals:
 
 
 
-class TransformAnimationSettingWidget : public AbstractComponentsSettingWidget
+class TransformAnimationSettingWidget : public AbstractAnimationSettingWidget
 {
     Q_OBJECT
 public:
@@ -82,7 +81,6 @@ private:
 private:
     QMenu *setDataMenu;
     TransformAnimation *animation;
-    AnimationControllBar *controllBar;
 };
 
 

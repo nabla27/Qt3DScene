@@ -92,24 +92,17 @@ void TransformAnimation::receiveUpdatedParam(const QVector3D &pos, const QVector
 TransformAnimationSettingWidget::TransformAnimationSettingWidget(Qt3DCore::QTransform *const transform,
                                                                  TransformAnimation *animation,
                                                                  QWidget *parent)
-    : AbstractComponentsSettingWidget(transform, "Transform Animation", parent, true)
+    : AbstractAnimationSettingWidget(transform, animation, "Transform Animation", parent, true)
     , setDataMenu(new QMenu(contents))
     , animation(animation)
-    , controllBar(new AnimationControllBar(contents, animation))
 {
-    QVBoxLayout *vLayout = new QVBoxLayout(contents);
-    QFormLayout *fLayout = new QFormLayout;
-
-    contents->setLayout(vLayout);
-    vLayout->addWidget(controllBar);
-    vLayout->addLayout(fLayout);
-
     QPushButton *button = new QPushButton(contents);
-    fLayout->addRow("Set data", button);
 
-    setupMenu();
+    addFormRow("Set Data", button);
 
     connect(button, &QPushButton::released, this, &TransformAnimationSettingWidget::onSetDataMenu);
+
+    setupMenu();
 }
 
 AbstractComponentsSettingWidget *const TransformAnimationSettingWidget::clone() const

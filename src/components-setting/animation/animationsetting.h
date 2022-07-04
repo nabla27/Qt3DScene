@@ -5,6 +5,7 @@
 #include <QSequentialAnimationGroup>
 #include <Qt3DCore/QEntity>
 #include <QVBoxLayout>
+#include <QFormLayout>
 #include <QSpinBox>
 #include <QSlider>
 
@@ -88,7 +89,46 @@ private:
 
     QMetaObject::Connection spinBoxToTime;
     QMetaObject::Connection timeToSpinBox;
-    QMetaObject::Connection test;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+class AbstractAnimationSettingWidget : public AbstractComponentsSettingWidget
+{
+    Q_OBJECT
+public:
+    explicit AbstractAnimationSettingWidget(Qt3DCore::QComponent *target,
+                                            AbstractAnimation *animation,
+                                            const QString& name,
+                                            QWidget *parent,
+                                            const bool isSubComponent = false);
+
+    virtual AbstractComponentsSettingWidget *const clone() const = 0;
+
+protected:
+    void addFormRow(const QString& text, QWidget *w) { animationFLayout->addRow(text, w); }
+    void addSettingWidget(QWidget *w) { animationVLayout->addWidget(w); }
+
+private slots:
+    void setLoopCount(const int value);
+
+private:
+    AbstractAnimation *animation;
+    QVBoxLayout *animationVLayout;
+    QFormLayout *animationFLayout;
+    AnimationControllBar *controllBar;
+    QSpinBox *durationSpinBox;
+    QSpinBox *loopCountSpinBox;
 };
 
 
