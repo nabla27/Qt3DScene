@@ -35,13 +35,17 @@ class ComponentListItem : public QObject, public QListWidgetItem
 {
     Q_OBJECT
 public:
-    explicit ComponentListItem(Qt3DCore::QComponent *component, ComponentsListWidget *widget);
+    explicit ComponentListItem(Qt3DCore::QEntity *entity, Qt3DCore::QComponent *component, ComponentsListWidget *widget);
 
 public:
     void update();
 
 public:
+    Qt3DCore::QEntity *entity;
     Qt3DCore::QComponent *component;
+
+private slots:
+    void receiveRemoveEntity(Qt3DCore::QEntity *entity);
 };
 
 class ComponentsListWidget : public QListWidget
@@ -132,7 +136,6 @@ private:
     QScrollArea *scrollArea;
     QWidget *contentsArea;
     QVBoxLayout *contentsLayout;
-    QList<AbstractComponentsSettingWidget*> contentsList;
 };
 
 

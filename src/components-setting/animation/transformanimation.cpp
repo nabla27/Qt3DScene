@@ -1,6 +1,12 @@
 #include "transformanimation.h"
 #include <QVector3D>
 
+//DEBUG
+#include <QLibrary>
+TransformController::TransformController(QObject *parent)
+    : QObject(parent)
+{
+}
 
 void TransformController::update(const QVector3D& pos,
                                  const QVector3D& rot,
@@ -23,6 +29,10 @@ void TransformController::update(const QVector3D& pos,
     }
 }
 
+void TransformController::setUpdateFunc(UpdateTransformFuncType func)
+{
+    updateTransformFunc = func;
+}
 
 
 
@@ -74,23 +84,47 @@ void TransformAnimation::receiveUpdatedParam(const QVector3D &pos, const QVector
 
 
 
-
+#include <QFormLayout>
+//DEBUG
+#include <QPushButton>
 TransformAnimationSettingWidget::TransformAnimationSettingWidget(Qt3DCore::QTransform *const transform,
                                                                  TransformAnimation *animation,
                                                                  QWidget *parent)
-    : AbstractComponentsSettingWidget(transform, "Transform Animation", parent)
+    : AbstractComponentsSettingWidget(transform, "Transform Animation", parent, true)
+    , setDataMenu(new QMenu(contents))
     , animation(animation)
     , controllBar(new AnimationControllBar(contents, animation))
 {
     QVBoxLayout *vLayout = new QVBoxLayout(contents);
+    QFormLayout *fLayout = new QFormLayout;
 
     contents->setLayout(vLayout);
     vLayout->addWidget(controllBar);
+    vLayout->addLayout(fLayout);
+
+    QPushButton *button = new QPushButton(contents);
+    fLayout->addRow("Set data", button);
+
+    setupMenu();
+
+    connect(button, &QPushButton::released, this, &TransformAnimationSettingWidget::onSetDataMenu);
 }
 
 AbstractComponentsSettingWidget *const TransformAnimationSettingWidget::clone() const
 {
     return nullptr;
+}
+
+void TransformAnimationSettingWidget::onSetDataMenu()
+{
+    setDataMenu->exec(cursor().pos());
+}
+
+void TransformAnimationSettingWidget::setupMenu()
+{
+    setDataMenu->addAction("DLL file");
+    setDataMenu->addAction("TSETEEWT");
+    setDataMenu->addAction("seta");
 }
 
 

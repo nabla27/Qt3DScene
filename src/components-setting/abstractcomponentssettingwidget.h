@@ -10,11 +10,16 @@ class AbstractComponentsSettingWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AbstractComponentsSettingWidget(Qt3DCore::QComponent *const component, const QString& name, QWidget *parent);
+    explicit AbstractComponentsSettingWidget(Qt3DCore::QComponent *const component,
+                                             const QString& name,
+                                             QWidget *parent,
+                                             const bool isSubComponent = false);
 
+public:
     Qt3DCore::QComponent *const component() const { return targetComponent; }
     virtual AbstractComponentsSettingWidget *const clone() const = 0;
     void setIcon(const QIcon& icon) { iconLabel->setPixmap(icon.pixmap(32, 32)); }
+    void setParentEntity(Qt3DCore::QEntity *entity) { this->entity = entity; }
 
 protected:
     QWidget *contents;
@@ -24,9 +29,12 @@ private slots:
     void expandContents();
     void contractContents();
     void requestRemove();
+    void receiveRemoveEntity(Qt3DCore::QEntity *entity);
     void requestClone();
 
 private:
+    bool isSubComponent;
+    Qt3DCore::QEntity *entity;
     Qt3DCore::QComponent *const targetComponent;
 
     QToolBar *toolBar;

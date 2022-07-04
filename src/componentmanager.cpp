@@ -48,8 +48,9 @@ ComponentsMenu::ComponentsMenu(QWidget *parent)
 
 
 #include <Qt3DCore/QComponent>
-ComponentListItem::ComponentListItem(Qt3DCore::QComponent *component, ComponentsListWidget *widget)
+ComponentListItem::ComponentListItem(Qt3DCore::QEntity *entity, Qt3DCore::QComponent *component, ComponentsListWidget *widget)
     : QListWidgetItem(component->objectName(), widget)
+    , entity(entity)
     , component(component)
 {
     setCheckState(Qt::CheckState::Checked);
@@ -61,6 +62,14 @@ void ComponentListItem::update()
         component->setEnabled(true);
     else
         component->setEnabled(false);
+}
+
+void ComponentListItem::receiveRemoveEntity(Qt3DCore::QEntity *entity)
+{
+    if(this->entity == entity)
+    {
+        this->deleteLater();
+    }
 }
 
 ComponentsListWidget::ComponentsListWidget(QWidget *parent)
@@ -82,8 +91,12 @@ void ComponentsListWidget::receiveChangedItem(QListWidgetItem *item)
 void ComponentsListWidget::emitRemoveRequest()
 {
     ComponentListItem *item = static_cast<ComponentListItem*>(currentItem());
-    emit removeComponentRequested(static_cast<ComponentListItem*>(currentItem())->component);
-    delete takeItem(indexFromItem(item).row());
+
+    if(item)
+    {
+        emit removeComponentRequested(item->component);
+        delete takeItem(indexFromItem(item).row());
+    }
 }
 
 void ComponentsListWidget::onCustomContextMenu(const QPoint& pos)
@@ -201,36 +214,32 @@ void ComponentsSettingPage::setEntityEnable(const bool checked)
 
 void ComponentsSettingPage::removeComponent(Qt3DCore::QComponent *const component)
 {
-    entityItem->entity->removeComponent(component);
-
-    /* DEBUG componentをdelete()やdeleteLayter()するとクラッシュする
-     * QTransformはクラッシュしないが，MeshやMaterialなどはクラッシュする*/
-    //if(component->entities().count() == 0) component->deleteLater();  //他のEntityでも使われていない場合
-
-    for(AbstractComponentsSettingWidget *w : contentsList)
+    if(component)
     {
-        if(w->component() == component)
+        entityItem->entity->removeComponent(component);
+
+        if(component->entities().count() == 0)
         {
-            contentsLayout->removeWidget(w);
-            delete w;
+            /* delete component */
         }
     }
 }
 
 void ComponentsSettingPage::addComponent(Qt3DCore::QComponent *const component, AbstractComponentsSettingWidget *w)
 {
-    ComponentListItem *listItem = new ComponentListItem(component, componentsListWidget);
+    ComponentListItem *listItem = new ComponentListItem(entityItem->entity, component, componentsListWidget);
     componentsListWidget->addItem(listItem);
     entityItem->entity->addComponent(component);
     component->setShareable(true);
 
     if(w)
     {
-        contentsList.append(w);
         contentsLayout->addWidget(w);
+        w->setParentEntity(entityItem->entity);
 
         connect(w, &AbstractComponentsSettingWidget::cloneRequested, this, &ComponentsSettingPage::setCloneWidget);
         connect(w, &AbstractComponentsSettingWidget::destroyed, listItem, &ComponentListItem::deleteLater);
+        connect(listItem, &ComponentListItem::destroyed, w, &AbstractComponentsSettingWidget::deleteLater);
         connect(w, &AbstractComponentsSettingWidget::removeRequested, this, &ComponentsSettingPage::removeComponent);
     }
 }

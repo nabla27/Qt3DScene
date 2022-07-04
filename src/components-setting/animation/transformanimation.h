@@ -11,14 +11,13 @@
 class TransformController : public QObject
 {
     Q_OBJECT
-
+public:
     typedef void (*UpdateTransformFuncType)(float*);
 
-public:
-    explicit TransformController(QObject *parent) : QObject(parent) {}
+    explicit TransformController(QObject *parent);
 
 public slots:
-    void setUpdateFunc(UpdateTransformFuncType func) { updateTransformFunc = func; }
+    void setUpdateFunc(UpdateTransformFuncType func);
     void update(const QVector3D& pos, const QVector3D& rot, const QVector3D& scale, const int& msec);
 
 private:
@@ -74,7 +73,14 @@ public:
 
     AbstractComponentsSettingWidget *const clone() const;
 
+private slots:
+    void onSetDataMenu();
+
 private:
+    void setupMenu();
+
+private:
+    QMenu *setDataMenu;
     TransformAnimation *animation;
     AnimationControllBar *controllBar;
 };
