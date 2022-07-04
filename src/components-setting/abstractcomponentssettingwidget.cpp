@@ -11,10 +11,10 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     , toolBar(new QToolBar(this))
     , iconLabel(new QLabel(this))
     , label(new QLabel(name, toolBar))
-    , expandAction(new QAction(QIcon(QPixmap(":icon/play")), "expand", toolBar))
-    , contractAction(new QAction(QIcon(QPixmap(":/icon/sort")), "contract", toolBar))
-    , cloneAction(new QAction(QIcon(QPixmap(":/icon/clone")), "clone", toolBar))
-    , removeAction(new QAction(QIcon(QPixmap(":/icon/trash-can")), "remove", toolBar))
+    , expandAction(new QAction(IconSet::play, "expand", toolBar))
+    , contractAction(new QAction(IconSet::sort, "contract", toolBar))
+    , cloneAction(new QAction(IconSet::clone, "clone", toolBar))
+    , removeAction(new QAction(IconSet::trashcan, "remove", toolBar))
 {
     QVBoxLayout *vLayout = new QVBoxLayout(this);
     QLabel *spacer = new QLabel(toolBar);
@@ -46,7 +46,6 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     connect(contractAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::contractContents);
     connect(cloneAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::requestClone);
     connect(removeAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::requestRemove);
-    connect(this, &AbstractComponentsSettingWidget::loadIconRequested, this, &AbstractComponentsSettingWidget::setIcon);
 }
 
 void AbstractComponentsSettingWidget::expandContents()

@@ -12,7 +12,8 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/3dwindow.cpp \
            $$PWD/componentmanager.cpp \
            $$PWD/mainwindow.cpp \
-           $$PWD/scenemanager.cpp
+           $$PWD/scenemanager.cpp \
+           $$PWD/utility.cpp
 
 RESOURCES +=
 

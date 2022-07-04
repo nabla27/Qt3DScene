@@ -14,7 +14,7 @@ public:
 
     Qt3DCore::QComponent *const component() const { return targetComponent; }
     virtual AbstractComponentsSettingWidget *const clone() const = 0;
-    void setIcon(const QString& path) { iconLabel->setPixmap(path); }
+    void setIcon(const QIcon& icon) { iconLabel->setPixmap(icon.pixmap(32, 32)); }
 
 protected:
     QWidget *contents;
@@ -41,7 +41,6 @@ private:
 signals:
     void cloneRequested(AbstractComponentsSettingWidget *w);
     void removeRequested(Qt3DCore::QComponent *comp);
-    void loadIconRequested(const QString& path);
 };
 
 #endif // ABSTRACT_COMPONENTS_SETTING_WIDGET_H

@@ -127,17 +127,7 @@ EntityMenu::EntityMenu(QWidget *parent)
 
 #include <QToolBar>
 #include <QVBoxLayout>
-
-#include <Qt3DExtras/QText2DEntity>
-#include <Qt3DExtras/QConeMesh>
-#include <Qt3DExtras/QCuboidMesh>
-#include <Qt3DExtras/QCylinderMesh>
-#include <Qt3DExtras/QExtrudedTextMesh>
-#include <Qt3DExtras/QPlaneMesh>
-#include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QTorusMesh>
-#include <Qt3DExtras/QPhongMaterial>
-#include <Qt3DCore/QTransform>
+#include "utility.h"
 
 SceneManager::SceneManager(QWidget *parent)
     : QWidget(parent)
@@ -163,7 +153,7 @@ void SceneManager::setupLayout()
     vLayout->addWidget(entityTree);
 
     toolBar->setIconSize(QSize(15, 15));
-    QAction *addEntityAction = toolBar->addAction(QIcon(QPixmap(":/icon/plus")), "Add entity");
+    QAction *addEntityAction = toolBar->addAction(IconSet::plus, "Add Entity");
 
     vLayout->setSpacing(0);
     vLayout->setContentsMargins(0, 0, 0, 0);
@@ -232,6 +222,7 @@ void SceneManager::emitSelectedEntity(QTreeWidgetItem *item, int column)
     }
 }
 
+#include <Qt3DExtras/QText2DEntity>
 void SceneManager::createNewEntity(ECStruct::EntitySet entityEnum)
 {
     Qt3DCore::QEntity *entity = nullptr;

@@ -9,7 +9,7 @@ ConeMeshSettingWidget::ConeMeshSettingWidget(Qt3DExtras::QConeMesh *mesh, QWidge
     : AbstractComponentsSettingWidget(mesh, "ConeMesh", parent)
     , mesh(mesh)
 {
-    setIcon(":/icon/3dmesh");
+    setIcon(IconSet::mesh3d);
 
     QFormLayout *fLayout = new QFormLayout(contents);
     QDoubleSpinBox *topRadiusSpinBox = new QDoubleSpinBox(contents);

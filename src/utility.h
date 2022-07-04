@@ -60,4 +60,41 @@ inline const QRect getRectFromScreenRatio(const QSize& screenSize, const float& 
 }
 
 
+
+
+
+
+
+
+
+
+#include <QIcon>
+struct IconSet
+{
+public:
+    static void load();
+
+    static QIcon mesh3d;
+    static QIcon object3d;
+    static QIcon surface3d;
+    static QIcon transform3d;
+    static QIcon animationgroup;
+
+    static QIcon clone;
+    static QIcon gear;
+    static QIcon import;
+    static QIcon play;
+    static QIcon plus;
+    static QIcon sort;
+    static QIcon trashcan;
+};
+
+
+
+
+
+
+
+
+
 #endif // UTILITY_H

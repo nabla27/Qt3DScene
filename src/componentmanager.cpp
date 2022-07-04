@@ -121,8 +121,8 @@ ComponentsSettingPage::ComponentsSettingPage(EntityTreeItem *entityItem)
     : QWidget(nullptr)
     , entityItem(entityItem)
     , componentsMenu(new ComponentsMenu(this))
-    , addComponentsAction(new QAction(QIcon(QPixmap(":/icon/plus")), "Add component"))
-    , addClonedCompAction(new QAction(QIcon(QPixmap(":/icon/import")), "Add cloned component"))
+    , addComponentsAction(new QAction(IconSet::plus, "Add component"))
+    , addClonedCompAction(new QAction(IconSet::clone, "Add cloned component"))
     , entityNameEdit(new QLineEdit(this))
     , entityEnableCheck(new QCheckBox(this))
     , splitter(new QSplitter(Qt::Orientation::Vertical, this))
@@ -434,7 +434,9 @@ void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
     addComponent(mesh, widget);
 }
 
-#include "components-setting/animationsetting.h"
+//DEBUG
+#include "components-setting/animation/animationsetting.h"
+#include "components-setting/animation/transformanimation.h"
 void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsSet c)
 {
     AbstractComponentsSettingWidget *widget = nullptr;
@@ -445,7 +447,10 @@ void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsS
     case ECStruct::ComponentsSet::AnimationGroup:
     {
         comp = new Qt3DCore::QComponent(entityItem->entity);
-        widget = new AnimationGroupSettingWidget(entityItem->entity, comp, contentsArea);
+        //widget = new AnimationGroupSettingWidget(entityItem->entity, entityItem->entity->componentsOfType<Qt3DCore::QTransform>().at(0), contentsArea);
+        Qt3DCore::QTransform *transform = entityItem->entity->componentsOfType<Qt3DCore::QTransform>().at(0);
+        TransformAnimation *animation = new TransformAnimation(transform);
+        widget = new TransformAnimationSettingWidget(transform, animation, contentsArea);
         break;
     }
     default:

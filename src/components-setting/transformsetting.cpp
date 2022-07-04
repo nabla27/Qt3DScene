@@ -11,7 +11,7 @@ TransformWidget::TransformWidget(Qt3DCore::QTransform *transform, QWidget *paren
 {
     setupContentsLayout();
 
-    setIcon(":/icon/3dtransform");
+    setIcon(IconSet::transform3d);
 }
 
 void TransformWidget::setupContentsLayout()
