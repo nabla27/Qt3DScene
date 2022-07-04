@@ -6,6 +6,8 @@
 TransformController::TransformController(QObject *parent)
     : QObject(parent)
 {
+    QLibrary lib("E:/repos/TestDll/x64/Debug/TestDll.dll");
+    updateTransformFunc = (UpdateTransformFuncType)lib.resolve("updateTransform");
 }
 
 void TransformController::update(const QVector3D& pos,

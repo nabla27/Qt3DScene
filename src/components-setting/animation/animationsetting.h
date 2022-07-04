@@ -6,6 +6,7 @@
 #include <Qt3DCore/QEntity>
 #include <QVBoxLayout>
 #include <QSpinBox>
+#include <QSlider>
 
 class AnimationEditor;
 class AnimationGroupSettingWidget : public AbstractComponentsSettingWidget
@@ -71,14 +72,23 @@ protected:
     QAction *playAction;
     QAction *stopAction;
     QSpinBox *timeSpinBox;
+    QSlider *timeSlider;
 
 private slots:
     void play();
     void reset();
     void setIconPlay();
+    void setMaximumValue(const int duration);
+
+private:
+    void setConnectionState(const AbstractAnimation::State& newState, const AbstractAnimation::State& oldState);
 
 private:
     AbstractAnimation *animation;
+
+    QMetaObject::Connection spinBoxToTime;
+    QMetaObject::Connection timeToSpinBox;
+    QMetaObject::Connection test;
 };
 
 

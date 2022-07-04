@@ -90,28 +90,33 @@ AnimationEditor::AnimationEditor(QWidget *parent)
 
 
 
-
 AnimationControllBar::AnimationControllBar(QWidget *parent, AbstractAnimation *animation)
     : QToolBar(parent)
     , playAction(new QAction(QApplication::style()->standardIcon(QStyle::SP_MediaPlay), "Play", this))
     , stopAction(new QAction(QApplication::style()->standardIcon(QStyle::SP_MediaStop), "Stop", this))
     , timeSpinBox(new QSpinBox(this))
+    , timeSlider(new QSlider(Qt::Orientation::Horizontal, this))
     , animation(animation)
 {
     addAction(playAction);
     addAction(stopAction);
+    addWidget(new QLabel("Time:"));
     addWidget(timeSpinBox);
+    addWidget(timeSlider);
 
     connect(playAction, &QAction::triggered, this, &AnimationControllBar::play);
     connect(stopAction, &QAction::triggered, this, &AnimationControllBar::reset);
-    connect(timeSpinBox, &QSpinBox::valueChanged, animation, &AbstractAnimation::setCurrentTime);
-    connect(animation, &AbstractAnimation::currentTimeChanged, timeSpinBox, &QSpinBox::setValue);
     connect(animation, &AbstractAnimation::finished, this, &AnimationControllBar::setIconPlay);
-    connect(animation, &AbstractAnimation::durationChanged, timeSpinBox, &QSpinBox::setMaximum);
+    connect(animation, &AbstractAnimation::durationChanged, this, &AnimationControllBar::setMaximumValue);
+    connect(animation, &AbstractAnimation::stateChanged, this, &AnimationControllBar::setConnectionState);
+    connect(timeSpinBox, &QSpinBox::valueChanged, timeSlider, &QSlider::setValue);
+    connect(timeSlider, &QSlider::valueChanged, timeSpinBox, &QSpinBox::setValue);
+    spinBoxToTime = connect(timeSpinBox, &QSpinBox::valueChanged, animation, &AbstractAnimation::setCurrentTime);
 
     setIconSize(QSize(15, 15));
 
     animation->setDuration(1000);
+    setContentsMargins(0, 0, 0, 0);
 }
 
 void AnimationControllBar::play()
@@ -132,9 +137,9 @@ void AnimationControllBar::play()
     }
     case QAbstractAnimation::State::Stopped:
     {
+        playAction->setIcon(QApplication::style()->standardIcon(QStyle::SP_MediaPause));
         animation->setCurrentTime(0);
         animation->start();
-        playAction->setIcon(QApplication::style()->standardIcon(QStyle::SP_MediaPause));
         break;
     }
     default:
@@ -145,11 +150,48 @@ void AnimationControllBar::play()
 void AnimationControllBar::reset()
 {
     animation->setCurrentTime(0);
+    timeSpinBox->setValue(0);        //State::PausedまたはState::Stoppedの場合に必要
 }
 
 void AnimationControllBar::setIconPlay()
 {
     playAction->setIcon(QApplication::style()->standardIcon(QStyle::SP_MediaPlay));
+}
+
+void AnimationControllBar::setMaximumValue(const int duration)
+{
+    timeSpinBox->setMaximum(duration);
+    timeSlider->setMaximum(duration);
+}
+
+/* timeSpinBox::valueChanged() と animation::currentTimeChanged() のどちらか一方向のみスロットをつなげる
+ * timeSpinBox::valueChanged() -> animation::setCurrentTime() -> animation::currentTimeChanged() -> timeSpinBox::setValue()
+ * と両方向のスロットをつなげると, setCurrentTime()とcurrentTimeChanged()の間に処理時間があると，timeSpinBox::valueChanged()とtimeSpinBox::setValue()間で
+ * 無限ループに陥る可能性が出てくるため。
+ * アニメーションが止まっているとき(Paused,Stopped)には timeSpinBox::valueChanged() -> animation::setCurrentTime()
+ * アニメーションが開始されているとき(Running)には animation::currentTimeChanged() -> timeSpinBox::setValue()
+ */
+void AnimationControllBar::setConnectionState(const AbstractAnimation::State &newState, const AbstractAnimation::State&)
+{
+    switch(newState)
+    {
+    case AbstractAnimation::State::Paused:
+    case AbstractAnimation::State::Stopped:
+    {
+        animation->disconnect(timeToSpinBox);
+        animation->disconnect(test);
+        spinBoxToTime = connect(timeSpinBox, &QSpinBox::valueChanged, animation, &AbstractAnimation::setCurrentTime);
+        break;
+    }
+    case AbstractAnimation::State::Running:
+    {
+        timeSpinBox->disconnect(spinBoxToTime);
+        timeToSpinBox = connect(animation, &AbstractAnimation::currentTimeChanged, timeSpinBox, &QSpinBox::setValue);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 
