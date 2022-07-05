@@ -102,33 +102,45 @@ private:
 
 
 
-
+class SelectControllerWidget;
 class AbstractAnimationSettingWidget : public AbstractComponentsSettingWidget
 {
     Q_OBJECT
 public:
-    explicit AbstractAnimationSettingWidget(Qt3DCore::QComponent *target,
+    explicit AbstractAnimationSettingWidget(Qt3DCore::QEntity *entity,
                                             AbstractAnimation *animation,
-                                            const QString& name,
-                                            QWidget *parent,
-                                            const bool isSubComponent = false);
+                                            QWidget *parent);
 
-    virtual AbstractComponentsSettingWidget *const clone() const = 0;
-
-protected:
-    void addFormRow(const QString& text, QWidget *w) { animationFLayout->addRow(text, w); }
-    void addSettingWidget(QWidget *w) { animationVLayout->addWidget(w); }
+    AbstractComponentsSettingWidget *const clone() const override { return nullptr; }
 
 private slots:
     void setLoopCount(const int value);
 
 private:
     AbstractAnimation *animation;
-    QVBoxLayout *animationVLayout;
-    QFormLayout *animationFLayout;
     AnimationControllBar *controllBar;
+    SelectControllerWidget *selectControllerWidget;
+
     QSpinBox *durationSpinBox;
     QSpinBox *loopCountSpinBox;
+    QLineEdit *controllerNameEdit;
+};
+
+
+
+
+
+
+
+
+class SelectControllerWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit SelectControllerWidget(QWidget *parent, Qt3DCore::QEntity *entity);
+
+private:
+    Qt3DCore::QEntity *entity;
 };
 
 

@@ -40,7 +40,7 @@ AnimationGroupSettingWidget::AnimationGroupSettingWidget(Qt3DCore::QEntity *enti
 
 
 
-    AnimationControllBar *bar = new AnimationControllBar(this, new TransformAnimation(qobject_cast<Qt3DCore::QTransform*>(c)));
+    AnimationControllBar *bar = new AnimationControllBar(this, new AbstractAnimation(qobject_cast<Qt3DCore::QTransform*>(c)));
     vLayout->addWidget(bar);
 }
 
@@ -201,35 +201,52 @@ void AnimationControllBar::setConnectionState(const AbstractAnimation::State &ne
 
 
 
-#include <QFormLayout>
-AbstractAnimationSettingWidget::AbstractAnimationSettingWidget(Qt3DCore::QComponent *target,
+#include <QLineEdit>
+#include <QToolButton>
+AbstractAnimationSettingWidget::AbstractAnimationSettingWidget(Qt3DCore::QEntity *entity,
                                                                AbstractAnimation *animation,
-                                                               const QString& name,
-                                                               QWidget *parent,
-                                                               const bool isSubComponent)
-    : AbstractComponentsSettingWidget(target, name, parent, isSubComponent)
+                                                               QWidget *parent)
+    : AbstractComponentsSettingWidget(nullptr, "Animation", parent)
     , animation(animation)
-    , animationVLayout(new QVBoxLayout(contents))
-    , animationFLayout(new QFormLayout)
     , controllBar(new AnimationControllBar(contents, animation))
+    , selectControllerWidget(new SelectControllerWidget(contents, entity))
     , durationSpinBox(new QSpinBox(contents))
     , loopCountSpinBox(new QSpinBox(contents))
+    , controllerNameEdit(new QLineEdit("None"))
 {
-    contents->setLayout(animationVLayout);
-    animationVLayout->addWidget(controllBar);
-    animationVLayout->addLayout(animationFLayout);
-    animationFLayout->addRow("Duration", durationSpinBox);
-    animationFLayout->addRow("Loop Count", loopCountSpinBox);
+    QVBoxLayout *vLayout = new QVBoxLayout(contents);
+    QFormLayout *fLayout = new QFormLayout;
+    QWidget *selectControllerForm = new QWidget(contents);
+    QHBoxLayout *selectControllerLayout = new QHBoxLayout(selectControllerForm);
+    QToolButton *selectControllerButton = new QToolButton(selectControllerForm);
+
+    contents->setLayout(vLayout);
+    vLayout->addWidget(controllBar);
+    vLayout->addLayout(fLayout);
+    fLayout->addRow("Duration", durationSpinBox);
+    fLayout->addRow("Loop Count", loopCountSpinBox);
+    fLayout->addRow("Controller", selectControllerForm);
+    selectControllerForm->setLayout(selectControllerLayout);
+    selectControllerLayout->addWidget(controllerNameEdit);
+    selectControllerLayout->addWidget(selectControllerButton);
 
     durationSpinBox->setMaximum(10000000);
     loopCountSpinBox->setMaximum(1000000);
-
     durationSpinBox->setValue(animation->duration());
     loopCountSpinBox->setValue((animation->loopCount() == -1) ? 0 : animation->loopCount());
+    controllerNameEdit->setReadOnly(true);
+    selectControllerButton->setText("...");
+
+    selectControllerWidget->setContentsMargins(0, 0, 0, 0);
+    selectControllerLayout->setContentsMargins(0, 0, 0, 0);
+    selectControllerLayout->setSpacing(0);
+
+    animation->setController(new TransformDllController(entity->componentsOfType<Qt3DCore::QTransform>().at(0)));
 
     connect(durationSpinBox, &QSpinBox::valueChanged, animation, &AbstractAnimation::setDuration);
     connect(animation, &AbstractAnimation::durationChanged, durationSpinBox, &QSpinBox::setValue);
     connect(loopCountSpinBox, &QSpinBox::valueChanged, this, &AbstractAnimationSettingWidget::setLoopCount);
+    connect(selectControllerButton, &QToolButton::released, selectControllerWidget, &SelectControllerWidget::show);
 }
 
 void AbstractAnimationSettingWidget::setLoopCount(const int value)
@@ -240,6 +257,29 @@ void AbstractAnimationSettingWidget::setLoopCount(const int value)
         animation->setLoopCount(value);
 }
 
+
+
+
+
+
+
+
+
+
+
+SelectControllerWidget::SelectControllerWidget(QWidget *parent, Qt3DCore::QEntity *entity)
+    : QWidget(parent)
+    , entity(entity)
+{
+    setWindowTitle("Slect Animation Controller");
+    setWindowFlag(Qt::WindowType::Window, true);
+
+
+    QVBoxLayout *vLayout = new QVBoxLayout(this);
+    setLayout(vLayout);
+
+    vLayout->addWidget(new QLineEdit("test", this));
+}
 
 
 

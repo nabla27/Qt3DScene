@@ -6,12 +6,10 @@
 #include <QSpacerItem>
 AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComponent *component,
                                                                  const QString& name,
-                                                                 QWidget *parent,
-                                                                 const bool isSubComponent)
+                                                                 QWidget *parent)
     : QWidget(parent)
     , contents(new QWidget(this))
-    , isSubComponent(isSubComponent)
-    , targetComponent(component)
+    , targetComponent(component)   //このWidgetが消去されたとき，削除を要請するcomponent
     , toolBar(new QToolBar(this))
     , iconLabel(new QLabel(this))
     , label(new QLabel(name, toolBar))
@@ -50,8 +48,6 @@ AbstractComponentsSettingWidget::AbstractComponentsSettingWidget(Qt3DCore::QComp
     connect(contractAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::contractContents);
     connect(cloneAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::requestClone);
     connect(removeAction, &QAction::triggered, this, &AbstractComponentsSettingWidget::requestRemove);
-
-    connect(targetComponent, &Qt3DCore::QComponent::removedFromEntity, this, &AbstractComponentsSettingWidget::receiveRemoveEntity);
 }
 
 void AbstractComponentsSettingWidget::expandContents()
@@ -70,18 +66,10 @@ void AbstractComponentsSettingWidget::contractContents()
 
 void AbstractComponentsSettingWidget::requestRemove()
 {
-    if(!isSubComponent)
+    if(targetComponent)
         emit removeRequested(targetComponent);
 
     this->deleteLater();
-}
-
-void AbstractComponentsSettingWidget::receiveRemoveEntity(Qt3DCore::QEntity *entity)
-{
-    if(this->entity == entity)
-    {
-        this->deleteLater();
-    }
 }
 
 void AbstractComponentsSettingWidget::requestClone()

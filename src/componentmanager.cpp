@@ -235,7 +235,7 @@ void ComponentsSettingPage::addComponent(Qt3DCore::QComponent *const component, 
     if(w)
     {
         contentsLayout->addWidget(w);
-        w->setParentEntity(entityItem->entity);
+        //w->setParentEntity(entityItem->entity);
 
         connect(w, &AbstractComponentsSettingWidget::cloneRequested, this, &ComponentsSettingPage::setCloneWidget);
         connect(w, &AbstractComponentsSettingWidget::destroyed, listItem, &ComponentListItem::deleteLater);
@@ -456,10 +456,8 @@ void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsS
     case ECStruct::ComponentsSet::AnimationGroup:
     {
         comp = new Qt3DCore::QComponent(entityItem->entity);
-        //widget = new AnimationGroupSettingWidget(entityItem->entity, entityItem->entity->componentsOfType<Qt3DCore::QTransform>().at(0), contentsArea);
-        Qt3DCore::QTransform *transform = entityItem->entity->componentsOfType<Qt3DCore::QTransform>().at(0);
-        TransformAnimation *animation = new TransformAnimation(transform);
-        widget = new TransformAnimationSettingWidget(transform, animation, contentsArea);
+        AbstractAnimation *animation = new AbstractAnimation(this);
+        widget = new AbstractAnimationSettingWidget(entityItem->entity, animation, contentsArea);
         break;
     }
     default:

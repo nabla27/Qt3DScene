@@ -5,52 +5,32 @@
 #include "src/components-setting/animation/animationsetting.h"
 #include <Qt3DCore/QTransform>
 #include <QThread>
+#include <QMutex>
 
 
-class TransformController : public QObject
+
+
+
+
+class TransformDllController : public AbstractController
 {
     Q_OBJECT
-public:
-    typedef void (*UpdateTransformFuncType)(float*);
 
-    explicit TransformController(QObject *parent);
+    typedef void (*UpdateTransformFuncType)(float*) ;
+
+public:
+    explicit TransformDllController(Qt3DCore::QTransform *transform, QObject *parent = nullptr);
+
+public:
+    QList<QWidget*> paramWidgets() const override;
 
 public slots:
-    void setUpdateFunc(UpdateTransformFuncType func);
-    void update(const QVector3D& pos, const QVector3D& rot, const QVector3D& scale, const int& msec);
-
-private:
-    UpdateTransformFuncType updateTransformFunc = nullptr;
-
-signals:
-    void updated(const QVector3D& pos, const QVector3D& rot, const QVector3D& scale, const int& msec);
-};
-
-
-
-
-
-
-
-
-class TransformAnimation : public AbstractAnimation
-{
-    Q_OBJECT
-public:
-    explicit TransformAnimation(Qt3DCore::QTransform *transform);
-    ~TransformAnimation();
-
-protected:
-    void updateCurrentTime(int msec) override;
-    void receiveUpdatedParam(const QVector3D& pos, const QVector3D& rot, const QVector3D& scale, const int& time);
+    void update(const int& msec) override;
 
 private:
     Qt3DCore::QTransform *transform;
-    TransformController *controller;
-    QThread thread;
-
-signals:
-    void updateRequested(const QVector3D& pos, const QVector3D& rot, const QVector3D& scale, const int& msec);
+    UpdateTransformFuncType updateTransformFunc;
+    QMutex mutex;
 };
 
 
@@ -62,26 +42,27 @@ signals:
 
 
 
-class TransformAnimationSettingWidget : public AbstractAnimationSettingWidget
-{
-    Q_OBJECT
-public:
-    explicit TransformAnimationSettingWidget(Qt3DCore::QTransform *const transform,
-                                             TransformAnimation *aimation,
-                                             QWidget *parent);
 
-    AbstractComponentsSettingWidget *const clone() const;
-
-private slots:
-    void onSetDataMenu();
-
-private:
-    void setupMenu();
-
-private:
-    QMenu *setDataMenu;
-    TransformAnimation *animation;
-};
+//class TransformAnimationSettingWidget : public AbstractAnimationSettingWidget
+//{
+//    Q_OBJECT
+//public:
+//    explicit TransformAnimationSettingWidget(Qt3DCore::QTransform *const transform,
+//                                             AbstractAnimation *aimation,
+//                                             QWidget *parent);
+//
+//    AbstractComponentsSettingWidget *const clone() const;
+//
+//private slots:
+//    void onSetDataMenu();
+//
+//private:
+//    void setupMenu();
+//
+//private:
+//    QMenu *setDataMenu;
+//    AbstractAnimation *animation;
+//};
 
 
 
