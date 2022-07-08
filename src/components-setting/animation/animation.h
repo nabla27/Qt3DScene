@@ -13,7 +13,7 @@ public:
     explicit AbstractController(QObject *parent) : QObject(parent) {}
 
 public:
-    virtual QList<QWidget*> paramWidgets() const = 0;
+    virtual QWidget* paramWidgets(QWidget *parent) const = 0;
 
 public slots:
     virtual void update(const int& msec) = 0;

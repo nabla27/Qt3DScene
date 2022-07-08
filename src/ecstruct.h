@@ -43,7 +43,7 @@ public:
         ConeMesh = 1200, CuboidMesh, CylinderMesh, ExtrudedTextMesh, PlaneMesh, SphereMesh, TorusMesh,
 
         /* Animation */
-        AnimationGroup = 1300,
+        BasicAnimation = 1300, GroupAnimation,
     };
 
 

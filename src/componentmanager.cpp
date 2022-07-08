@@ -453,12 +453,16 @@ void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsS
 
     switch(c)
     {
-    case ECStruct::ComponentsSet::AnimationGroup:
+    case ECStruct::ComponentsSet::BasicAnimation:
     {
         comp = new Qt3DCore::QComponent(entityItem->entity);
         AbstractAnimation *animation = new AbstractAnimation(this);
         widget = new AbstractAnimationSettingWidget(entityItem->entity, animation, contentsArea);
         break;
+    }
+    case ECStruct::ComponentsSet::GroupAnimation:
+    {
+        return;
     }
     default:
         return;

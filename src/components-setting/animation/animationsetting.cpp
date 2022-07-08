@@ -241,7 +241,10 @@ AbstractAnimationSettingWidget::AbstractAnimationSettingWidget(Qt3DCore::QEntity
     selectControllerLayout->setContentsMargins(0, 0, 0, 0);
     selectControllerLayout->setSpacing(0);
 
-    animation->setController(new TransformDllController(entity->componentsOfType<Qt3DCore::QTransform>().at(0)));
+    //DEBUG
+    TransformDllController *c = new TransformDllController(entity->componentsOfType<Qt3DCore::QTransform>().at(0));
+    animation->setController(c);
+    vLayout->addWidget(c->paramWidgets(contents));
 
     connect(durationSpinBox, &QSpinBox::valueChanged, animation, &AbstractAnimation::setDuration);
     connect(animation, &AbstractAnimation::durationChanged, durationSpinBox, &QSpinBox::setValue);

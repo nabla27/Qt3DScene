@@ -4,32 +4,38 @@
 
 
 
-#include <QLibrary>
+#include <QLineEdit>
+#include <QToolButton>
+#include <QFileDialog>
+#include <QPushButton>
+#include <QCheckBox>
 TransformDllController::TransformDllController(Qt3DCore::QTransform *transform, QObject *parent)
     : AbstractController(parent)
     , transform(transform)
+    , updateTransformFunc(nullptr)
+    , funcName(QString())
+    , dllPath(QString())
 {
-    QLibrary lib("E:/repos/TestDll/x64/Debug/TestDll.dll");
-    updateTransformFunc = (UpdateTransformFuncType)lib.resolve("updateTransform");
-
     connect(transform, &Qt3DCore::QTransform::destroyed, this, &TransformDllController::deleteLater);
 }
 
-
-
-
-
-
-
-
-
-QList<QWidget*> TransformDllController::paramWidgets() const
+QWidget* TransformDllController::paramWidgets(QWidget *parent) const
 {
-    return QList<QWidget*>();
+    TransformDllControllerSettingWidget *widget = new TransformDllControllerSettingWidget(parent);
+
+    connect(widget, &TransformDllControllerSettingWidget::dllPathEdited, this, &TransformDllController::setDllPath);
+    connect(widget, &TransformDllControllerSettingWidget::funcNameEdited, this, &TransformDllController::setFuncName);
+    connect(widget, &TransformDllControllerSettingWidget::dllLoadRequested, this, &TransformDllController::loadDll);
+    connect(widget, &TransformDllControllerSettingWidget::dllUnloadRequested, this, &TransformDllController::unloadDll);
+    connect(this, &TransformDllController::stateChanged, widget, &TransformDllControllerSettingWidget::receiveDllState);
+
+    return widget;
 }
 
 void TransformDllController::update(const int& msec)
 {
+    if(!updateTransformFunc) return;
+
     mutex.lock();
 
     float p[10] = { transform->translation().x(), transform->translation().y(), transform->translation().z(),
@@ -50,6 +56,144 @@ void TransformDllController::update(const int& msec)
     emit updated(msec);
 }
 
+void TransformDllController::setFuncName(const QString& funcName)
+{
+    this->funcName = funcName;
+}
+
+void TransformDllController::setDllPath(const QString& path)
+{
+    dllPath = path;
+}
+
+void TransformDllController::loadDll()
+{
+    lib.setFileName(dllPath);
+
+    if(lib.load())
+    {
+        emit stateChanged(DLLState::IsLoaded);
+
+        updateTransformFunc = (UpdateTransformFuncType)lib.resolve(funcName.toUtf8().constData());
+
+        if(updateTransformFunc)
+            emit stateChanged(DLLState::IsResolved);
+        else
+            emit stateChanged(DLLState::FailedToResolve);
+    }
+    else
+    {
+        lib.unload();
+        updateTransformFunc = nullptr;
+        emit stateChanged(DLLState::FailedToLoad);
+    }
+}
+
+void TransformDllController::unloadDll()
+{
+    lib.unload();
+    updateTransformFunc = nullptr;
+
+    emit stateChanged(DLLState::IsUnloaded);
+}
+
+
+
+
+
+
+
+
+
+
+
+TransformDllControllerSettingWidget::TransformDllControllerSettingWidget(QWidget *parent)
+    : QWidget(parent)
+    , dllPathEdit(new QLineEdit(this))
+    , openDialogButton(new QToolButton(this))
+    , fileDialog(new QFileDialog(this))
+    , funcNameEdit(new QLineEdit(this))
+    , requestLoadButton(new QPushButton("Load", this))
+    , requestUnloadButton(new QPushButton("Unload", this))
+    , validPalette(dllPathEdit->palette())
+    , invalidPalette(dllPathEdit->palette())
+{
+    QFormLayout *fLayout = new QFormLayout(this);
+    QHBoxLayout *dllPathEditLayout = new QHBoxLayout;
+    QHBoxLayout *requestButtonLayout = new QHBoxLayout;
+
+    setLayout(fLayout);
+    fLayout->addRow("Dll Path", dllPathEditLayout);
+    dllPathEditLayout->addWidget(dllPathEdit);
+    dllPathEditLayout->addWidget(openDialogButton);
+    fLayout->addRow("Func Name", funcNameEdit);
+    fLayout->addRow("", requestButtonLayout);
+    requestButtonLayout->addWidget(requestLoadButton);
+    requestButtonLayout->addWidget(requestUnloadButton);
+
+    openDialogButton->setText("...");
+    openDialogButton->setToolTip("open file dialog");
+    fileDialog->setFileMode(QFileDialog::FileMode::ExistingFile);
+    fileDialog->setNameFilter("*.dll");
+    requestUnloadButton->setEnabled(false);
+
+    validPalette.setColor(QPalette::Text, Qt::black);
+    invalidPalette.setColor(QPalette::Text, Qt::red);
+
+    fLayout->setContentsMargins(0, 0, 0, 0);
+    dllPathEditLayout->setSpacing(0);
+    dllPathEditLayout->setContentsMargins(0, 0, 0, 0);
+    requestButtonLayout->setSpacing(0);
+    requestButtonLayout->setContentsMargins(0, 0, 0, 0);
+
+    connect(dllPathEdit, &QLineEdit::textEdited, this, &TransformDllControllerSettingWidget::dllPathEdited);
+    connect(openDialogButton, &QToolButton::released, fileDialog, &QFileDialog::show);
+    connect(fileDialog, &QFileDialog::fileSelected, this, &TransformDllControllerSettingWidget::dllPathEdited);
+    connect(fileDialog, &QFileDialog::fileSelected, dllPathEdit, &QLineEdit::setText);
+    connect(funcNameEdit, &QLineEdit::textEdited, this, &TransformDllControllerSettingWidget::funcNameEdited);
+    connect(requestLoadButton, &QPushButton::released, this, &TransformDllControllerSettingWidget::dllLoadRequested);
+    connect(requestUnloadButton, &QPushButton::released, this, &TransformDllControllerSettingWidget::dllUnloadRequested);
+}
+
+void TransformDllControllerSettingWidget::receiveDllState(const TransformDllController::DLLState& state)
+{
+    dllPathEdit->setPalette(validPalette);
+    funcNameEdit->setPalette(validPalette);
+    requestLoadButton->setEnabled(true);
+    requestUnloadButton->setEnabled(false);
+
+    switch(state)
+    {
+    case TransformDllController::DLLState::FailedToLoad:
+    {
+        dllPathEdit->setPalette(invalidPalette);
+        return;
+    }
+    case TransformDllController::DLLState::FailedToResolve:
+    {
+        funcNameEdit->setPalette(invalidPalette);
+        return;
+    }
+    case TransformDllController::DLLState::IsLoaded:
+    {
+        return;
+    }
+    case TransformDllController::DLLState::IsResolved:
+    {
+        requestLoadButton->setEnabled(false);
+        requestUnloadButton->setEnabled(true);
+        return;
+    }
+    case TransformDllController::DLLState::IsUnloaded:
+    {
+        requestLoadButton->setEnabled(true);
+        requestUnloadButton->setEnabled(false);
+        return;
+    }
+    default:
+        return;
+    }
+}
 
 
 
@@ -63,53 +207,6 @@ void TransformDllController::update(const int& msec)
 
 
 
-
-
-
-#include <QFormLayout>
-//DEBUG
-#include <QToolButton>
-#include <QLineEdit>
-//TransformAnimationSettingWidget::TransformAnimationSettingWidget(Qt3DCore::QTransform *const transform,
-//                                                                 TransformAnimation *animation,
-//                                                                 QWidget *parent)
-//    : AbstractAnimationSettingWidget(transform, animation, "Transform Animation", parent, true)
-//    , setDataMenu(new QMenu(contents))
-//    , animation(animation)
-//{
-//    QWidget *setControllerWidget = new QWidget(contents);
-//    QHBoxLayout *setControllerLayout = new QHBoxLayout(setControllerWidget);
-//    QLineEdit *controllerNameEdit = new QLineEdit("Test.dll", setControllerWidget);
-//    QToolButton *setControllerButton = new QToolButton(setControllerWidget);
-//
-//    setControllerWidget->setLayout(setControllerLayout);
-//    setControllerLayout->addWidget(controllerNameEdit);
-//    setControllerLayout->addWidget(setControllerButton);
-//
-//    addFormRow("Controller", setControllerWidget);
-//
-//    setControllerWidget->setContentsMargins(0, 0, 0, 0);
-//    setControllerLayout->setContentsMargins(0, 0, 0, 0);
-//    setControllerLayout->setSpacing(0);
-//}
-//
-//AbstractComponentsSettingWidget *const TransformAnimationSettingWidget::clone() const
-//{
-//    return nullptr;
-//}
-//
-//void TransformAnimationSettingWidget::onSetDataMenu()
-//{
-//    setDataMenu->exec(cursor().pos());
-//}
-//
-//void TransformAnimationSettingWidget::setupMenu()
-//{
-//    setDataMenu->addAction("DLL file");
-//    setDataMenu->addAction("TSETEEWT");
-//    setDataMenu->addAction("seta");
-//}
-//
 
 
 

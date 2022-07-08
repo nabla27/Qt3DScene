@@ -139,6 +139,9 @@ class SelectControllerWidget : public QWidget
 public:
     explicit SelectControllerWidget(QWidget *parent, Qt3DCore::QEntity *entity);
 
+    enum class ControllerTarget { Transform };
+    enum class ControllerType { TransformDLLController = 0 };
+
 private:
     Qt3DCore::QEntity *entity;
 };
