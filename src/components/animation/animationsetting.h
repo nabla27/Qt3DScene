@@ -1,6 +1,6 @@
 #ifndef ANIMATION_SETTING_H
 #define ANIMATION_SETTING_H
-#include "src/components-setting/abstractcomponentssettingwidget.h"
+#include "src/components/abstractcomponentssettingwidget.h"
 #include "animation.h"
 #include <QSequentialAnimationGroup>
 #include <Qt3DCore/QEntity>

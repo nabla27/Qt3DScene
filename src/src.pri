@@ -17,4 +17,4 @@ SOURCES += $$PWD/main.cpp \
 
 RESOURCES +=
 
-include(components-setting/components-setting.pri)
+include(components/components.pri)

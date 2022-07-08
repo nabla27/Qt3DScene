@@ -7,6 +7,7 @@
 
 //DEBUG
 #include "transformanimation.h"
+#include "gridmeshanimation.h"
 #include <Qt3DCore/QTransform>
 
 AnimationGroupSettingWidget::AnimationGroupSettingWidget(Qt3DCore::QEntity *entity, Qt3DCore::QComponent *c, QWidget *parent)
@@ -40,8 +41,8 @@ AnimationGroupSettingWidget::AnimationGroupSettingWidget(Qt3DCore::QEntity *enti
 
 
 
-    AnimationControllBar *bar = new AnimationControllBar(this, new AbstractAnimation(qobject_cast<Qt3DCore::QTransform*>(c)));
-    vLayout->addWidget(bar);
+    //AnimationControllBar *bar = new AnimationControllBar(this, new AbstractAnimation(qobject_cast<Qt3DCore::QTransform*>(c)));
+    //vLayout->addWidget(bar);
 }
 
 
@@ -242,7 +243,10 @@ AbstractAnimationSettingWidget::AbstractAnimationSettingWidget(Qt3DCore::QEntity
     selectControllerLayout->setSpacing(0);
 
     //DEBUG
-    TransformDllController *c = new TransformDllController(entity->componentsOfType<Qt3DCore::QTransform>().at(0));
+    //TransformDllController *c = new TransformDllController(entity->componentsOfType<Qt3DCore::QTransform>().at(0));
+    //animation->setController(c);
+    //vLayout->addWidget(c->paramWidgets(contents));
+    GridMeshDllController *c = new GridMeshDllController(entity->componentsOfType<GridMesh>().at(0));
     animation->setController(c);
     vLayout->addWidget(c->paramWidgets(contents));
 

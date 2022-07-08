@@ -91,7 +91,7 @@ signals:
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QSplitter>
-#include "components-setting/abstractcomponentssettingwidget.h"
+#include "components/abstractcomponentssettingwidget.h"
 class ComponentsSettingPage : public QWidget
 {
     Q_OBJECT
@@ -116,6 +116,7 @@ private:
     void createMaterialComponent(const ECStruct::ComponentsSet c);
     void createMeshComponent(const ECStruct::ComponentsSet c);
     void createAnimationComponent(const ECStruct::ComponentsSet c);
+    void createCustomMeshComponent(const ECStruct::ComponentsSet c);
     void addComponent(Qt3DCore::QComponent *const component, AbstractComponentsSettingWidget *w);
 
 private:

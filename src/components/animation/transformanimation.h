@@ -2,7 +2,7 @@
 #define TRANSFORMANIMATION_H
 
 #include "animation.h"
-#include "src/components-setting/animation/animationsetting.h"
+#include "src/components/animation/animationsetting.h"
 #include <Qt3DCore/QTransform>
 #include <QThread>
 #include <QMutex>
@@ -10,7 +10,7 @@
 
 class QPushButton;
 class QFileDialog;
-
+class QToolButton;
 
 
 

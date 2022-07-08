@@ -257,7 +257,7 @@ void ComponentsSettingPage::addClonedComponent()
 }
 
 
-#include "components-setting/transformsetting.h"
+#include "components/transformsetting.h"
 void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
 {
     const ECStruct::ComponentType componentType = ECStruct::ComponentType(((int)c - ECStruct::enumOffset) / ECStruct::enumStride);
@@ -287,6 +287,11 @@ void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
         createAnimationComponent(c);
         return;
     }
+    case ECStruct::ComponentType::CustomMesh:
+    {
+        createCustomMeshComponent(c);
+        return;
+    }
     default:
         return;
     }
@@ -303,7 +308,7 @@ void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
 #include <Qt3DExtras/QPerVertexColorMaterial>
 #include <Qt3DExtras/QPhongAlphaMaterial>
 //#include <Qt3DExtras/QPhongMaterial>
-#include "components-setting/materialsetting.h"
+#include "components/materialsetting.h"
 #include <Qt3DExtras/QTextureMaterial>
 void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSet c)
 {
@@ -383,7 +388,7 @@ void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSe
 }
 
 //#include <Qt3DExtras/QConeMesh>
-#include "components-setting/meshsetting.h"
+#include "components/meshsetting.h"
 #include <Qt3DExtras/QCuboidMesh>
 #include <Qt3DExtras/QCylinderMesh>
 #include <Qt3DExtras/QExtrudedTextMesh>
@@ -444,8 +449,8 @@ void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
 }
 
 //DEBUG
-#include "components-setting/animation/animationsetting.h"
-#include "components-setting/animation/transformanimation.h"
+#include "components/animation/animationsetting.h"
+#include "components/animation/transformanimation.h"
 void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsSet c)
 {
     AbstractComponentsSettingWidget *widget = nullptr;
@@ -463,6 +468,30 @@ void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsS
     case ECStruct::ComponentsSet::GroupAnimation:
     {
         return;
+    }
+    default:
+        return;
+    }
+
+    comp->setObjectName(enumToString(c));
+    addComponent(comp, widget);
+}
+
+//DEBUG
+#include "components/custommesh/gridmesh.h"
+void ComponentsSettingPage::createCustomMeshComponent(const ECStruct::ComponentsSet c)
+{
+    AbstractComponentsSettingWidget *widget = nullptr;
+    Qt3DCore::QComponent *comp = nullptr;
+
+    switch(c)
+    {
+    case ECStruct::ComponentsSet::GridMesh:
+    {
+        GridMesh *mesh = new GridMesh(entityItem->entity);
+        widget = new GridMeshSettingWidget(mesh, contentsArea);
+        comp = mesh;
+        break;
     }
     default:
         return;
