@@ -1,7 +1,7 @@
 #include "custommesh.h"
 
 void GridIndices::createSquareIndices(const unsigned int& rows,
-                                            const unsigned int& cols)
+                                      const unsigned int& cols)
 {
     //頂点インデックスの数 = 2*(2*(rows*cols) - (rows+cols))
     const unsigned int indexCount = 2 * (2 * rows * cols - rows - cols);
@@ -56,3 +56,37 @@ void GridIndices::createSquareIndices(const unsigned int& rows,
 
     emit created(indexArray, indexCount);
 }
+
+void GridIndices::createSingleLineIndices(const unsigned int& pointCount)
+{
+    /* * * * * */
+    const unsigned int indexCount = pointCount * 2 - 2;
+
+    QByteArray indexArray;
+    indexArray.resize(indexCount * sizeof(unsigned int));
+    unsigned int *index = reinterpret_cast<unsigned int*>(indexArray.data());
+
+    for(unsigned int p = 0; p < pointCount - 1; ++p)
+    {
+        *index++ = p;
+        *index++ = p + 1;
+    }
+
+    emit created(indexArray, indexCount);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

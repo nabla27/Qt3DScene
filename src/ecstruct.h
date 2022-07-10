@@ -29,7 +29,7 @@ public:
         FirstPersonCamera = 1300, OrbitCamera,
     };
 
-    enum class ComponentType { Transform, Material, Mesh, Animation, CustomMesh };
+    enum class ComponentType { Transform, Material, Mesh, Animation, Plot };
     enum class ComponentsSet
     {
         /* Transform */
@@ -45,8 +45,8 @@ public:
         /* Animation */
         BasicAnimation = 1300, GroupAnimation,
 
-        /* CustomMesh */
-        GridMesh = 1400,
+        /* Plot */
+        GridMesh = 1400, ExplicitFuncLine,
     };
 
 

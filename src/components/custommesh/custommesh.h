@@ -10,6 +10,8 @@ public:
 
 public slots:
     void createSquareIndices(const unsigned int& row, const unsigned int& col);
+    void createSingleLineIndices(const unsigned int& pointCount);
+
 
 signals:
     void created(const QByteArray& array, const unsigned int& count);

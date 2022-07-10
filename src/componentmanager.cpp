@@ -287,9 +287,9 @@ void ComponentsSettingPage::createComponent(const ECStruct::ComponentsSet c)
         createAnimationComponent(c);
         return;
     }
-    case ECStruct::ComponentType::CustomMesh:
+    case ECStruct::ComponentType::Plot:
     {
-        createCustomMeshComponent(c);
+        createPlotComponent(c);
         return;
     }
     default:
@@ -479,7 +479,8 @@ void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsS
 
 //DEBUG
 #include "components/custommesh/gridmesh.h"
-void ComponentsSettingPage::createCustomMeshComponent(const ECStruct::ComponentsSet c)
+#include "components/custommesh/explicitfuncmesh.h"
+void ComponentsSettingPage::createPlotComponent(const ECStruct::ComponentsSet c)
 {
     AbstractComponentsSettingWidget *widget = nullptr;
     Qt3DCore::QComponent *comp = nullptr;
@@ -490,6 +491,12 @@ void ComponentsSettingPage::createCustomMeshComponent(const ECStruct::Components
     {
         GridMesh *mesh = new GridMesh(entityItem->entity);
         widget = new GridMeshSettingWidget(mesh, contentsArea);
+        comp = mesh;
+        break;
+    }
+    case ECStruct::ComponentsSet::ExplicitFuncLine:
+    {
+        ExplicitFuncMesh *mesh = new ExplicitFuncMesh(entityItem->entity);
         comp = mesh;
         break;
     }

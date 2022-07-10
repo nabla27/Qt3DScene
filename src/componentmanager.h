@@ -116,7 +116,7 @@ private:
     void createMaterialComponent(const ECStruct::ComponentsSet c);
     void createMeshComponent(const ECStruct::ComponentsSet c);
     void createAnimationComponent(const ECStruct::ComponentsSet c);
-    void createCustomMeshComponent(const ECStruct::ComponentsSet c);
+    void createPlotComponent(const ECStruct::ComponentsSet c);
     void addComponent(Qt3DCore::QComponent *const component, AbstractComponentsSettingWidget *w);
 
 private:
