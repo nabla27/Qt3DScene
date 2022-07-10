@@ -23,16 +23,17 @@ Window3D::Window3D()
     orbitCamController->setLookSpeed(180.0f);
     orbitCamController->setCamera(camera());
 
-    //Qt3DCore::QEntity *coneEntity = new Qt3DCore::QEntity(rootEntity);
-    //Qt3DExtras::QConeMesh *coneMesh = new Qt3DExtras::QConeMesh(coneEntity);
-    //Qt3DExtras::QPhongMaterial *material = new Qt3DExtras::QPhongMaterial(coneEntity);
-    //Qt3DCore::QTransform *transform = new Qt3DCore::QTransform(coneEntity);
+    //DEBUG
+    registerAspect(new CustomAspect(this));  //Aspectの登録
 
-    //coneEntity->addComponent(coneMesh);
-    //coneEntity->addComponent(material);
-    //coneEntity->addComponent(transform);
+    FpsMonitor *fps = new FpsMonitor(rootEntity);
+    rootEntity->addComponent(fps);
+    fps->setRollingMeanFrameCount(100);
+}
 
-
-
-
+CustomAspect::CustomAspect(QObject *parent)
+    : Qt3DCore::QAbstractAspect(parent)
+{
+    auto mapper = QSharedPointer<FpsMonitorMapper>::create(this);
+    registerBackendType<FpsMonitor>(mapper);
 }
