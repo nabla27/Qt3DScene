@@ -2,6 +2,8 @@
 
 
 #include <QHBoxLayout>
+#include <QLabel>
+
 Form3DDoubleSpin::Form3DDoubleSpin(QWidget *parent)
     : QWidget(parent)
     , xLabel(new QLabel(" X", this))
@@ -65,7 +67,7 @@ void Form3DDoubleSpin::emitChangedValue()
 
 
 
-
+#include <QColorDialog>
 
 ColorDialogButton::ColorDialogButton(const QString& text, QWidget *parent)
     : QPushButton(text, parent)
@@ -90,6 +92,109 @@ void ColorDialogButton::setButtonColor(const QColor& color)
 }
 
 
+
+
+
+
+#include <QLineEdit>
+#include <QFormLayout>
+#include <QToolButton>
+#include <QFileDialog>
+DllSelectorWidget::DllSelectorWidget(const QStringList& funcNameList,
+                                     QWidget *parent)
+    : QWidget(parent)
+    , dllPathEdit(new QLineEdit(this))
+    , symbolNameEdit(new QLineEdit(this))
+    , requestLoadButton(new QPushButton("Load", this))
+    , requestUnloadButton(new QPushButton("Unload", this))
+    , validPalette(dllPathEdit->palette())
+    , invalidPalette(dllPathEdit->palette())
+{
+    QFormLayout *fLayout = new QFormLayout(this);
+    QHBoxLayout *dllPathEditLayout = new QHBoxLayout;
+    QToolButton *openFileDialogButton = new QToolButton(this);
+    QFileDialog *fileDialog = new QFileDialog(this);
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+
+    setLayout(fLayout);
+    fLayout->addRow("DLL Path", dllPathEditLayout);
+    dllPathEditLayout->addWidget(dllPathEdit);
+    dllPathEditLayout->addWidget(openFileDialogButton);
+    fLayout->addRow("Symbol Name", symbolNameEdit);
+
+    for(const QString& funcName : funcNameList)
+    {
+        QLabel *funcNameLabel = new QLabel(funcName, this);
+        funcNameLabel->setObjectName(funcName);
+        funcNameLabels.append(funcNameLabel);
+        fLayout->addRow("", funcNameLabel);
+    }
+
+    fLayout->addRow("", buttonLayout);
+    buttonLayout->addWidget(requestLoadButton);
+    buttonLayout->addWidget(requestUnloadButton);
+
+    openFileDialogButton->setText("...");
+    openFileDialogButton->setToolTip("open file dialog");
+    fileDialog->setFileMode(QFileDialog::FileMode::ExistingFile);
+    fileDialog->setNameFilter("*.dll");
+    invalidPalette.setColor(QPalette::Text, Qt::red);
+    requestUnloadButton->setEnabled(false);
+
+    setContentsMargins(0, 0, 0, 0);
+    fLayout->setContentsMargins(0, 0, 0, 0);
+    dllPathEditLayout->setSpacing(0);
+    dllPathEditLayout->setContentsMargins(0, 0, 0, 0);
+
+    connect(dllPathEdit, &QLineEdit::textEdited, this, &DllSelectorWidget::dllPathEdited);
+    connect(openFileDialogButton, &QToolButton::released, fileDialog, &QFileDialog::show);
+    connect(fileDialog, &QFileDialog::fileSelected, this, &DllSelectorWidget::dllPathEdited);
+    connect(fileDialog, &QFileDialog::fileSelected, dllPathEdit, &QLineEdit::setText);
+    connect(symbolNameEdit, &QLineEdit::textEdited, this, &DllSelectorWidget::symbolNameEdited);
+    connect(symbolNameEdit, &QLineEdit::textEdited, this, &DllSelectorWidget::changeFuncName);
+    connect(requestLoadButton, &QPushButton::released, this, &DllSelectorWidget::loadRequested);
+    connect(requestUnloadButton, &QPushButton::released, this, &DllSelectorWidget::unloadRequested);
+}
+
+void DllSelectorWidget::receiveDllState(const DllSelectorWidget::DllState& state)
+{
+    dllPathEdit->setPalette(validPalette);
+    requestLoadButton->setEnabled(true);
+    requestUnloadButton->setEnabled(false);
+
+    switch(state)
+    {
+    case DllState::FailedToLoad:
+    {
+        dllPathEdit->setPalette(invalidPalette);
+        return;
+    }
+    case DllState::FailedToResolve:
+    {
+        return;
+    }
+    case DllState::Resolved:
+    {
+        requestLoadButton->setEnabled(false);
+        requestUnloadButton->setEnabled(true);
+        return;
+    }
+    case DllState::Unloaded:
+    {
+        requestLoadButton->setEnabled(true);
+        requestUnloadButton->setEnabled(false);
+        return;
+    }
+    default:
+        break;
+    }
+}
+
+void DllSelectorWidget::changeFuncName(const QString& symbol)
+{
+    for(QLabel *const label : funcNameLabels)
+        label->setText(symbol + label->objectName());
+}
 
 
 

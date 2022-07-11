@@ -497,6 +497,7 @@ void ComponentsSettingPage::createPlotComponent(const ECStruct::ComponentsSet c)
     case ECStruct::ComponentsSet::ExplicitFuncLine:
     {
         ExplicitFuncMesh *mesh = new ExplicitFuncMesh(entityItem->entity);
+        widget = new ExplicitFuncMeshSettingWidget(mesh, contentsArea);
         comp = mesh;
         break;
     }

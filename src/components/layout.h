@@ -1,9 +1,11 @@
 #ifndef LAYOUT_H
 #define LAYOUT_H
 #include <QWidget>
-#include <QLabel>
-#include <QDoubleSpinBox>
 #include <QVector3D>
+#include <QDoubleSpinBox>
+
+class QLabel;
+
 class Form3DDoubleSpin : public QWidget
 {
     Q_OBJECT
@@ -51,7 +53,8 @@ signals:
 
 
 #include <QPushButton>
-#include <QColorDialog>
+class QColorDialog;
+
 class ColorDialogButton : public QPushButton
 {
     Q_OBJECT
@@ -70,6 +73,49 @@ private:
 signals:
     void colorChanged(const QColor& color);
 };
+
+
+
+
+
+
+
+
+
+
+class DllSelectorWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit DllSelectorWidget(const QStringList& funcNameList, QWidget *parent);
+
+    enum class DllState { Resolved, FailedToLoad, FailedToResolve, Unloaded };
+
+public slots:
+    void receiveDllState(const DllSelectorWidget::DllState& state);
+    void changeFuncName(const QString& symbol);
+
+private:
+    QLineEdit *dllPathEdit;
+    QLineEdit *symbolNameEdit;
+    QList<QLabel*> funcNameLabels;
+    QPushButton *requestLoadButton;
+    QPushButton *requestUnloadButton;
+
+    QPalette validPalette;
+    QPalette invalidPalette;
+
+signals:
+    void dllPathEdited(const QString& path);
+    void symbolNameEdited(const QString& symbol);
+    void loadRequested();
+    void unloadRequested();
+};
+
+
+
+
+
 
 
 #endif // LAYOUT_H
