@@ -1,26 +1,28 @@
 #include "gridmeshanimation.h"
 
+
+const QString GridMeshDllController::sizeFuncName = "sizeUIpUIpF";
+const QString GridMeshDllController::dataFuncName = "dataFpF";
 GridMeshDllController::GridMeshDllController(GridMesh *mesh, QObject *parent)
     : AbstractController(parent)
     , mesh(mesh)
     , sizeFunc(nullptr)
     , dataFunc(nullptr)
-    , sizeFuncName(QString())
-    , dataFuncName(QString())
 {
     connect(mesh, &GridMesh::destroyed, this, &GridMeshDllController::deleteLater);
 }
 
 QWidget* GridMeshDllController::paramWidgets(QWidget *parent) const
 {
-    GridMeshDataDllSelectorSettingWidget *widget = new GridMeshDataDllSelectorSettingWidget(parent);
+    DllSelectorWidget *widget = new DllSelectorWidget(QStringList() << sizeFuncName
+                                                                    << dataFuncName,
+                                                      parent);
 
-    connect(widget, &GridMeshDataDllSelectorSettingWidget::dllPathEdited, this, &GridMeshDllController::setDllPath);
-    connect(widget, &GridMeshDataDllSelectorSettingWidget::sizeFuncNameEdited, this, &GridMeshDllController::setSizeFuncName);
-    connect(widget, &GridMeshDataDllSelectorSettingWidget::dataFuncNameEdited, this, &GridMeshDllController::setDataFuncName);
-    connect(widget, &GridMeshDataDllSelectorSettingWidget::loadRequested, this, &GridMeshDllController::loadDll);
-    connect(widget, &GridMeshDataDllSelectorSettingWidget::unloadRequested, this, &GridMeshDllController::unloadDll);
-    connect(this, &GridMeshDllController::dllStateChanged, widget, &GridMeshDataDllSelectorSettingWidget::receiveDllState);
+    connect(widget, &DllSelectorWidget::dllPathEdited, this, &GridMeshDllController::setDllPath);
+    connect(widget, &DllSelectorWidget::funcSymbolEdited, this, &GridMeshDllController::setFuncSymbol);
+    connect(widget, &DllSelectorWidget::loadRequested, this, &GridMeshDllController::loadDll);
+    connect(widget, &DllSelectorWidget::unloadRequested, this, &GridMeshDllController::unloadDll);
+    connect(this, &GridMeshDllController::dllStateChanged, widget, &DllSelectorWidget::receiveDllState);
 
     return widget;
 }
@@ -53,28 +55,28 @@ void GridMeshDllController::loadDll()
 
     if(lib.load())
     {
-        sizeFunc = (GridMeshSizeFuncType)lib.resolve(sizeFuncName.toUtf8().constData());
+        sizeFunc = (GridMeshSizeFuncType)lib.resolve((funcSymbol + sizeFuncName).toUtf8().constData());
 
         if(sizeFunc)
         {
-            dataFunc = (GridMeshDataFuncType)lib.resolve(dataFuncName.toUtf8().constData());
+            dataFunc = (GridMeshDataFuncType)lib.resolve((funcSymbol + dataFuncName).toUtf8().constData());
 
             if(dataFunc)
             {
-                emit dllStateChanged(GridMeshDataDllSelector::DllState::Resolved);
+                emit dllStateChanged(DllSelectorWidget::DllState::Resolved);
                 return;
             }
             else
-                emit dllStateChanged(GridMeshDataDllSelector::DllState::FailedToResolveData);
+                emit dllStateChanged(DllSelectorWidget::DllState::FailedToResolve);
         }
         else
         {
-            emit dllStateChanged(GridMeshDataDllSelector::DllState::FailedToResolveSize);
+            emit dllStateChanged(DllSelectorWidget::DllState::FailedToResolve);
         }
     }
     else
     {
-        emit dllStateChanged(GridMeshDataDllSelector::DllState::FailedToLoad);
+        emit dllStateChanged(DllSelectorWidget::DllState::FailedToLoad);
     }
 
     lib.unload();
@@ -88,7 +90,7 @@ void GridMeshDllController::unloadDll()
     sizeFunc = nullptr;
     dataFunc = nullptr;
 
-    emit dllStateChanged(GridMeshDataDllSelector::DllState::Unloaded);
+    emit dllStateChanged(DllSelectorWidget::DllState::Unloaded);
 }
 
 

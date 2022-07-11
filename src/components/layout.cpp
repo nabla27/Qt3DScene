@@ -104,7 +104,7 @@ DllSelectorWidget::DllSelectorWidget(const QStringList& funcNameList,
                                      QWidget *parent)
     : QWidget(parent)
     , dllPathEdit(new QLineEdit(this))
-    , symbolNameEdit(new QLineEdit(this))
+    , funcSymbolEdit(new QLineEdit(this))
     , requestLoadButton(new QPushButton("Load", this))
     , requestUnloadButton(new QPushButton("Unload", this))
     , validPalette(dllPathEdit->palette())
@@ -120,7 +120,7 @@ DllSelectorWidget::DllSelectorWidget(const QStringList& funcNameList,
     fLayout->addRow("DLL Path", dllPathEditLayout);
     dllPathEditLayout->addWidget(dllPathEdit);
     dllPathEditLayout->addWidget(openFileDialogButton);
-    fLayout->addRow("Symbol Name", symbolNameEdit);
+    fLayout->addRow("Func Symbol", funcSymbolEdit);
 
     for(const QString& funcName : funcNameList)
     {
@@ -150,8 +150,8 @@ DllSelectorWidget::DllSelectorWidget(const QStringList& funcNameList,
     connect(openFileDialogButton, &QToolButton::released, fileDialog, &QFileDialog::show);
     connect(fileDialog, &QFileDialog::fileSelected, this, &DllSelectorWidget::dllPathEdited);
     connect(fileDialog, &QFileDialog::fileSelected, dllPathEdit, &QLineEdit::setText);
-    connect(symbolNameEdit, &QLineEdit::textEdited, this, &DllSelectorWidget::symbolNameEdited);
-    connect(symbolNameEdit, &QLineEdit::textEdited, this, &DllSelectorWidget::changeFuncName);
+    connect(funcSymbolEdit, &QLineEdit::textEdited, this, &DllSelectorWidget::funcSymbolEdited);
+    connect(funcSymbolEdit, &QLineEdit::textEdited, this, &DllSelectorWidget::changeFuncName);
     connect(requestLoadButton, &QPushButton::released, this, &DllSelectorWidget::loadRequested);
     connect(requestUnloadButton, &QPushButton::released, this, &DllSelectorWidget::unloadRequested);
 }

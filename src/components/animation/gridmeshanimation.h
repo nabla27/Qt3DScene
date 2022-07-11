@@ -8,7 +8,6 @@
 
 
 
-
 class GridMeshDllController : public AbstractController
 {
     Q_OBJECT
@@ -25,23 +24,25 @@ public:
 public slots:
     void update(const int& msec) override;
     void setDllPath(const QString& path) { dllPath = path; }
-    void setSizeFuncName(const QString& name) { sizeFuncName = name; }
-    void setDataFuncName(const QString& name) { dataFuncName = name; }
+    void setFuncSymbol(const QString& symbol) { funcSymbol = symbol; }
     void loadDll();
     void unloadDll();
 
 private:
     GridMesh *mesh;
+    QMutex mutex;
+
+    QLibrary lib;
     GridMeshSizeFuncType sizeFunc;
     GridMeshDataFuncType dataFunc;
-    QMutex mutex;
-    QLibrary lib;
+
     QString dllPath;
-    QString sizeFuncName;
-    QString dataFuncName;
+    QString funcSymbol;
+    static const QString sizeFuncName;
+    static const QString dataFuncName;
 
 signals:
-    void dllStateChanged(const GridMeshDataDllSelector::DllState& state);
+    void dllStateChanged(const DllSelectorWidget::DllState& state);
 };
 
 #endif // GRIDMESHANIMATION_H

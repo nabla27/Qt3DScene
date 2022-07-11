@@ -97,7 +97,7 @@ public slots:
 
 private:
     QLineEdit *dllPathEdit;
-    QLineEdit *symbolNameEdit;
+    QLineEdit *funcSymbolEdit;
     QList<QLabel*> funcNameLabels;
     QPushButton *requestLoadButton;
     QPushButton *requestUnloadButton;
@@ -107,7 +107,7 @@ private:
 
 signals:
     void dllPathEdited(const QString& path);
-    void symbolNameEdited(const QString& symbol);
+    void funcSymbolEdited(const QString& symbol);
     void loadRequested();
     void unloadRequested();
 };

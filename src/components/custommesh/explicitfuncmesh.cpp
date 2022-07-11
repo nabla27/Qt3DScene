@@ -162,8 +162,8 @@ void ExplicitFuncMeshSettingWidget::setDataSelector(const int index)
 
 
 
-const QString ExplicitFuncMeshDataDllSelector::samplesFuncName = "samplesUIntP";
-const QString ExplicitFuncMeshDataDllSelector::dataFuncName = "dataFloatP";
+const QString ExplicitFuncMeshDataDllSelector::samplesFuncName = "samplesUIp";
+const QString ExplicitFuncMeshDataDllSelector::dataFuncName = "dataFp";
 ExplicitFuncMeshDataDllSelector::ExplicitFuncMeshDataDllSelector(QObject *parent)
     : AbstractExplicitFuncMeshDataSelector(parent)
     , samplesFunc(nullptr)
@@ -193,6 +193,7 @@ void ExplicitFuncMeshDataDllSelector::load()
                 dataFunc(reinterpret_cast<float*>(array.data()));
 
                 emit dllStateChanged(DllSelectorWidget::DllState::Resolved);
+                emit dataSelected(array, samples);
             }
             else
             {
@@ -228,7 +229,7 @@ QWidget *const ExplicitFuncMeshDataDllSelector::settingWidget(QWidget *parent) c
                                                       parent);
 
     connect(widget, &DllSelectorWidget::dllPathEdited, this, &ExplicitFuncMeshDataDllSelector::setDllPath);
-    connect(widget, &DllSelectorWidget::symbolNameEdited, this, &ExplicitFuncMeshDataDllSelector::setFuncSymbol);
+    connect(widget, &DllSelectorWidget::funcSymbolEdited, this, &ExplicitFuncMeshDataDllSelector::setFuncSymbol);
     connect(widget, &DllSelectorWidget::loadRequested, this, &ExplicitFuncMeshDataDllSelector::load);
     connect(widget, &DllSelectorWidget::unloadRequested, this, &ExplicitFuncMeshDataDllSelector::unload);
     connect(this, &ExplicitFuncMeshDataDllSelector::dllStateChanged, widget, &DllSelectorWidget::receiveDllState);

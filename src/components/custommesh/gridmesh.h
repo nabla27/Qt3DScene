@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QLibrary>
 #include "../abstractcomponentssettingwidget.h"
+#include "../layout.h"
 
 class QPushButton;
 class AbstractGridMeshDataSelector;
@@ -120,15 +121,13 @@ signals:
 
 
 
-class GridMeshDataDllSelectorSettingWidget;
+
+
 class GridMeshDataDllSelector : public AbstractGridMeshDataSelector
 {
     Q_OBJECT
 public:
     GridMeshDataDllSelector(QObject *parent);
-
-    enum class DllState { Resolved, FailedToLoad, FailedToResolveSize, FailedToResolveData, Unloaded };
-    Q_ENUM(DllState)
 
     typedef void (*SizeFuncType)(unsigned int*, unsigned int*);
     typedef void (*DataFuncType)(float*);
@@ -137,8 +136,7 @@ public:
 
 public slots:
     void setDllPath(const QString& path) { dllPath = path; }
-    void setSizeFuncName(const QString& name) { sizeFuncName = name; }
-    void setDataFuncName(const QString& name) { dataFuncName = name; }
+    void setFuncSymbol(const QString& symbol) { funcSymbol = symbol; }
     void load();
     void unload();
 
@@ -149,61 +147,13 @@ private:
     DataFuncType dataFunc;
 
     QString dllPath;
-    QString sizeFuncName;
-    QString dataFuncName;
+    QString funcSymbol;
+    static const QString sizeFuncName;
+    static const QString dataFuncName;
 
 signals:
-    void dllStateChanged(const GridMeshDataDllSelector::DllState& state);
+    void dllStateChanged(const DllSelectorWidget::DllState& state);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class GridMeshDataDllSelectorSettingWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    explicit GridMeshDataDllSelectorSettingWidget(QWidget *parent);
-
-public slots:
-    void receiveDllState(const GridMeshDataDllSelector::DllState& state);
-
-private:
-    QLineEdit *dllPathEdit;
-    QLineEdit *sizeFuncNameEdit;
-    QLineEdit *dataFuncNameEdit;
-    QPushButton *requestLoadButton;
-    QPushButton *requestUnloadButton;
-
-    QPalette validPalette;
-    QPalette invalidPalette;
-
-signals:
-    void dllPathEdited(const QString& path);
-    void sizeFuncNameEdited(const QString& name);
-    void dataFuncNameEdited(const QString& name);
-    void loadRequested();
-    void unloadRequested();
-};
-
-
-
-
-
-
-
 
 
 
