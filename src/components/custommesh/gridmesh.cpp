@@ -191,8 +191,12 @@ void GridMeshDataDllSelector::load()
                 unsigned int rows = 0, cols = 0;
                 sizeFunc(&rows, &cols);
 
-                QByteArray array;
-                array.resize(3 * rows * cols * sizeof(float));
+                if(latticeCount != rows * cols)
+                {
+                    latticeCount = rows * cols;
+                    array.resize(3 * latticeCount * sizeof(float)); //(x,y,z) * 格子点 * float
+                }
+
                 dataFunc(reinterpret_cast<float*>(array.data()));
 
                 emit dllStateChanged(DllSelectorWidget::DllState::Resolved);

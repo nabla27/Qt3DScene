@@ -188,8 +188,12 @@ void ExplicitFuncMeshDataDllSelector::load()
                 unsigned int samples = 0;
                 samplesFunc(&samples);
 
-                QByteArray array;
-                array.resize(3 * samples * sizeof(float));
+                if(prevSamples != samples)
+                {
+                    prevSamples = samples;
+                    array.resize(3 * samples * sizeof(float)); //(x,y,z) * samples * float
+                }
+
                 dataFunc(reinterpret_cast<float*>(array.data()));
 
                 emit dllStateChanged(DllSelectorWidget::DllState::Resolved);

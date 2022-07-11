@@ -41,6 +41,9 @@ private:
     static const QString sizeFuncName;
     static const QString dataFuncName;
 
+    QByteArray array;
+    unsigned int latticeCount = 0;
+
 signals:
     void dllStateChanged(const DllSelectorWidget::DllState& state);
 };

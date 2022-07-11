@@ -159,6 +159,9 @@ private:
     static const QString samplesFuncName;
     static const QString dataFuncName;
 
+    QByteArray array;
+    unsigned int prevSamples = 0;
+
 signals:
     void dllStateChanged(const DllSelectorWidget::DllState& state);
     void messagePushed(const QString& message);

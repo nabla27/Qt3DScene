@@ -34,8 +34,12 @@ void GridMeshDllController::update(const int& msec)
     unsigned int rows = 0, cols = 0;
     sizeFunc(&rows, &cols, (float)msec / 1000.0f);
 
-    QByteArray array;
-    array.resize(3 * rows * cols * sizeof(float)); //(x,y,z) * 格子数 * float
+    if(latticeCount != rows * cols)
+    {
+        latticeCount = rows * cols;
+        array.resize(3 * latticeCount * sizeof(float)); //(x,y,z) * 格子数 * float
+    }
+
     float *p = reinterpret_cast<float*>(array.data());
 
     dataFunc(p, (float)msec / 1000.0f);
