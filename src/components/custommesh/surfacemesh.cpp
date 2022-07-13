@@ -54,8 +54,9 @@ SurfaceGeometry::SurfaceGeometry(Qt3DCore::QNode *parent)
     connect(gridColorVertex, &GridColorVertex::colorVertexCreated, this, &SurfaceGeometry::updateColorVertex);
     connect(gridNormalVertex, &GridNormalVertex::normalVertexCreated, this, &SurfaceGeometry::updateNormalVertex);
 
-    connect(this, &SurfaceGeometry::contourMinValueChanged, gridColorVertex, &GridColorVertex::setMinValue);
-    connect(this, &SurfaceGeometry::contourMaxValueChanged, gridColorVertex, &GridColorVertex::setMaxValue);
+    connect(this, &SurfaceGeometry::colorMapMinValueChanged, gridColorVertex, &GridColorVertex::setMinValue);
+    connect(this, &SurfaceGeometry::colorMapMaxValueChanged, gridColorVertex, &GridColorVertex::setMaxValue);
+    connect(this, &SurfaceGeometry::colorMapTypeChanged, gridColorVertex, &GridColorVertex::setColorMapType);
 
     thread.start();
     gridIndices->moveToThread(&thread);
@@ -97,8 +98,8 @@ void SurfaceGeometry::setDefaultSurface()
             *p++ = z;
         }
 
-    setContourMinValue(-10.0f);
-    setContourMaxValue(10.0f);
+    setColorMapMinValue(-10.0f);
+    setColorMapMaxValue(10.0f);
     setData(positionArray, rangeX, rangeZ);
 }
 

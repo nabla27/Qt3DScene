@@ -34,7 +34,7 @@ class GridColorVertex : public QObject
 public:
     explicit GridColorVertex(QObject *parent) : QObject(parent) {}
 
-    enum class ColorMapType { Turbo };
+    enum class ColorMapType { Turbo, Autumn };
     Q_ENUM(ColorMapType)
 
 public slots:
@@ -57,7 +57,8 @@ private:
     float maxValue = 0;
     ColorMapType colorMapType = ColorMapType(0);
 
-    static const QList<QVector3D> turboColorList;
+    static const QList<QVector3D> turboColorMap;
+    static const QList<QVector3D> autumnColorMap;
 
 signals:
     void colorVertexCreated(const QByteArray& array, const unsigned int& count);

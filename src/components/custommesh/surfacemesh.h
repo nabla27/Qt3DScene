@@ -18,8 +18,9 @@ public:
 public:
     void setDefaultSurface();
     void setData(const QByteArray& pos, const unsigned int& rowCount, const unsigned int& colCount);
-    void setContourMaxValue(const float& value) { emit contourMaxValueChanged(value); }
-    void setContourMinValue(const float& value) { emit contourMinValueChanged(value); }
+    void setColorMapMaxValue(const float& value) { emit colorMapMaxValueChanged(value); }
+    void setColorMapMinValue(const float& value) { emit colorMapMinValueChanged(value); }
+    void setColorMapType(const GridColorVertex::ColorMapType& type) { emit colorMapTypeChanged(type); }
 
 private slots:
     void updateIndices(const QByteArray& indices, const unsigned int& count);
@@ -50,8 +51,9 @@ signals:
     void updateColorVertexRequested(const QByteArray& array);
     void updateNormalVertexRequested(const QByteArray& array);
 
-    void contourMaxValueChanged(const float& value);
-    void contourMinValueChanged(const float& value);
+    void colorMapMaxValueChanged(const float& value);
+    void colorMapMinValueChanged(const float& value);
+    void colorMapTypeChanged(const GridColorVertex::ColorMapType& type);
 };
 
 
@@ -73,6 +75,15 @@ public slots:
 
     void setDefaultSurface()
     { static_cast<SurfaceGeometry*>(geometry())->setDefaultSurface(); }
+
+    void setColorMapMinValue(const float& min)
+    { static_cast<SurfaceGeometry*>(geometry())->setColorMapMinValue(min); }
+
+    void setColorMapMaxValue(const float& max)
+    { static_cast<SurfaceGeometry*>(geometry())->setColorMapMaxValue(max); }
+
+    void setColorMapType(const int& index)
+    { static_cast<SurfaceGeometry*>(geometry())->setColorMapType(GridColorVertex::ColorMapType(index)); }
 };
 
 
