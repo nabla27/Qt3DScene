@@ -34,18 +34,30 @@ class GridColorVertex : public QObject
 public:
     explicit GridColorVertex(QObject *parent) : QObject(parent) {}
 
+    enum class ColorMapType { Turbo };
+    Q_ENUM(ColorMapType)
+
 public slots:
-    void createColorVertex(const QByteArray& array);
     void setSize(const unsigned int& rowCount, const unsigned int& colCount)
     { this->rowCount = rowCount; this->colCount = colCount; }
+
+    void createColorVertex(const QByteArray& array);
+
+    void setMinValue(const float& min) { this->minValue = min; }
+    void setMaxValue(const float& max) { this->maxValue = max; }
+    void setColorMapType(const GridColorVertex::ColorMapType& type) { this->colorMapType = type; }
+
+private:
+    void createColorVertexFromMap(const QByteArray& array, const QList<QVector3D>& map);
 
 private:
     unsigned int rowCount = 0;
     unsigned int colCount = 0;
-    float startValue = 0;
-    float endValue = 0;
-    QColor startColor;
-    QColor endColor;
+    float minValue = 0;
+    float maxValue = 0;
+    ColorMapType colorMapType = ColorMapType(0);
+
+    static const QList<QVector3D> turboColorList;
 
 signals:
     void colorVertexCreated(const QByteArray& array, const unsigned int& count);

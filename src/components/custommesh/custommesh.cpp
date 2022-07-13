@@ -137,15 +137,70 @@ void GridIndices::createTriangleIndices()
 
 
 
+
+
+
+#include <QVector3D>
+#include <algorithm>
+const QList<QVector3D> GridColorVertex::turboColorList = QList<QVector3D>({
+                                                                              QVector3D(0.0f, 0.0f, 0.5f),
+                                                                              QVector3D(0.0f, 0.0f, 0.9f),
+                                                                              QVector3D(0.0f, 0.3f, 1.0f),
+                                                                              QVector3D(0.0f, 0.7f, 1.0f),
+                                                                              QVector3D(0.2f, 1.0f, 0.8f),
+                                                                              QVector3D(0.5f, 1.0f, 0.5f),
+                                                                              QVector3D(0.8f, 1.0f, 0.2f),
+                                                                              QVector3D(1.0f, 0.8f, 0.0f),
+                                                                              QVector3D(1.0f, 0.4f, 0.0f),
+                                                                              QVector3D(0.9f, 0.0f, 0.0f),
+                                                                              QVector3D(0.5f, 0.0f, 0.0f)
+                                                                          });
+
 void GridColorVertex::createColorVertex(const QByteArray& array)
+{
+    switch(colorMapType)
+    {
+    case ColorMapType::Turbo:
+    {
+        createColorVertexFromMap(array, turboColorList);
+        return;
+    }
+    default:
+        return;
+    }
+}
+
+void GridColorVertex::createColorVertexFromMap(const QByteArray &array, const QList<QVector3D> &map)
 {
     const unsigned int vertexCount = rowCount * colCount;
 
     QByteArray colorVertex;
     colorVertex.resize(3 * vertexCount * sizeof(float)); //(r,g,b) * vertexCount * float
+    float *c = reinterpret_cast<float*>(colorVertex.data());
+    const float *p = reinterpret_cast<const float*>(array.data());
+
+    const unsigned int maxColorIndex = map.size() - 1;
+
+    for(unsigned int iz = 0; iz < rowCount; ++iz)
+        for(unsigned int ix = 0; ix < colCount; ++ix)
+        {
+            const float y = p[(iz * colCount + ix) * 3 + 1];
+            const float normalizedValue = (y - minValue) / (maxValue - minValue); //y値を[minValue,maxValue]の間で正規化した値0~1
+
+            const float colorIndex = normalizedValue * maxColorIndex;
+            const float complement = colorIndex - (unsigned int)colorIndex;
+            const QVector3D color = map.at(colorIndex) + (map.at(colorIndex + 1) - map.at(colorIndex)) * complement;
+
+            qDebug() << color;
+
+            *c++ = color.x(); //R
+            *c++ = color.y(); //G
+            *c++ = color.z(); //B
+        }
 
     emit colorVertexCreated(colorVertex, vertexCount);
 }
+
 
 
 
@@ -218,6 +273,7 @@ void GridNormalVertex::createNormalVertex(const QByteArray& array)
             const bool isNotRight = ix < colCount - 1;
             const unsigned int index = 3 * (iz * colCount + ix); //点(iz,ix)のベクトルのx座標
 
+            /* 周囲の頂点座標を取得 */
             v0 = QVector3D(p[index], p[index + 1], p[index + 2]);
             if(iz > 0)
             {
