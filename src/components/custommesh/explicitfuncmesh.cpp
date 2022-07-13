@@ -22,8 +22,9 @@ ExplicitFuncGeometry::ExplicitFuncGeometry(Qt3DCore::QNode *parent)
     addAttribute(positionAttribute);
     addAttribute(indexAttribute);
 
+    connect(this, &ExplicitFuncGeometry::sampleCountChanged, gridIndices, &GridIndices::setColCount);
     connect(this, &ExplicitFuncGeometry::updateIndicesRequested, gridIndices, &GridIndices::createSingleLineIndices);
-    connect(gridIndices, &GridIndices::created, this, &ExplicitFuncGeometry::updateIndices);
+    connect(gridIndices, &GridIndices::indicesCreated, this, &ExplicitFuncGeometry::updateIndices);
 
     thread.start();
     gridIndices->moveToThread(&thread);
@@ -65,7 +66,8 @@ void ExplicitFuncGeometry::setData(const QByteArray &pos, const unsigned int &sa
     if(this->samples != samples)
     {
         this->samples = samples;
-        emit updateIndicesRequested(samples);
+        emit sampleCountChanged(samples);
+        emit updateIndicesRequested();
     }
 }
 

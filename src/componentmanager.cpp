@@ -480,6 +480,7 @@ void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsS
 //DEBUG
 #include "components/custommesh/gridmesh.h"
 #include "components/custommesh/explicitfuncmesh.h"
+#include "components/custommesh/surfacemesh.h"
 void ComponentsSettingPage::createPlotComponent(const ECStruct::ComponentsSet c)
 {
     AbstractComponentsSettingWidget *widget = nullptr;
@@ -491,6 +492,12 @@ void ComponentsSettingPage::createPlotComponent(const ECStruct::ComponentsSet c)
     {
         GridMesh *mesh = new GridMesh(entityItem->entity);
         widget = new GridMeshSettingWidget(mesh, contentsArea);
+        comp = mesh;
+        break;
+    }
+    case ECStruct::ComponentsSet::SurfaceMesh:
+    {
+        SurfaceMesh *mesh = new SurfaceMesh(entityItem->entity);
         comp = mesh;
         break;
     }

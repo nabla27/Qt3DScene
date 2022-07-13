@@ -39,7 +39,8 @@ private:
     unsigned int samples;
 
 signals:
-    void updateIndicesRequested(const unsigned int& samples);
+    void updateIndicesRequested();
+    void sampleCountChanged(const unsigned int& samples);
 };
 
 

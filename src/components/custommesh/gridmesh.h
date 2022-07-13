@@ -45,7 +45,8 @@ private:
     unsigned int _colCount = 0;
 
 signals:
-    void updateIndicesRequested(const int& row, const int& col);
+    void updateIndicesRequested();
+    void gridSizeChanged(const unsigned int& rowCount, const unsigned int& colCount);
 };
 
 

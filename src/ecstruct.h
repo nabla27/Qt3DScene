@@ -46,7 +46,7 @@ public:
         BasicAnimation = 1300, GroupAnimation,
 
         /* Plot */
-        GridMesh = 1400, ExplicitFuncLine,
+        GridMesh = 1400, SurfaceMesh, ExplicitFuncLine,
     };
 
 

@@ -22,8 +22,9 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent)
     addAttribute(positionAttribute);
     addAttribute(indexAttribute);
 
-    connect(this, &GridGeometry::updateIndicesRequested, gridIndices, &GridIndices::createSquareIndices);
-    connect(gridIndices, &GridIndices::created, this, &GridGeometry::updateIndices);
+    connect(this, &GridGeometry::gridSizeChanged, gridIndices, &GridIndices::setSize);
+    connect(this, &GridGeometry::updateIndicesRequested, gridIndices, &GridIndices::createRectangleIndices);
+    connect(gridIndices, &GridIndices::indicesCreated, this, &GridGeometry::updateIndices);
 
     thread.start();
     gridIndices->moveToThread(&thread);
@@ -70,7 +71,8 @@ void GridGeometry::setData(const QByteArray &pos, const unsigned int& rowCount, 
     {
         _rowCount = rowCount;
         _colCount = colCount;
-        emit updateIndicesRequested(_rowCount, _colCount);
+        emit gridSizeChanged(_rowCount, _colCount);
+        emit updateIndicesRequested();
     }
 }
 
