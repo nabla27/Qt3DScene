@@ -498,6 +498,7 @@ void ComponentsSettingPage::createPlotComponent(const ECStruct::ComponentsSet c)
     case ECStruct::ComponentsSet::SurfaceMesh:
     {
         SurfaceMesh *mesh = new SurfaceMesh(entityItem->entity);
+        widget = new SurfaceMeshSettingWidget(mesh, contentsArea);
         comp = mesh;
         break;
     }

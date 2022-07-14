@@ -5,6 +5,9 @@
 #include <Qt3DCore/QGeometry>
 #include <QThread>
 #include "custommesh.h"
+#include "../abstractcomponentssettingwidget.h"
+
+class QVBoxLayout;
 
 
 
@@ -87,6 +90,31 @@ public slots:
 };
 
 
+
+
+
+
+
+
+
+class SurfaceMeshSettingWidget : public AbstractComponentsSettingWidget
+{
+    Q_OBJECT
+
+public:
+    SurfaceMeshSettingWidget(SurfaceMesh *mesh, QWidget *parent);
+
+public:
+    AbstractComponentsSettingWidget *const clone() const override { return new SurfaceMeshSettingWidget(mesh, nullptr); }
+
+private slots:
+    void setDataSelector(const int index);
+
+private:
+    SurfaceMesh *mesh;
+    QVBoxLayout *vLayout;
+    QWidget *selectorSettingWidget;
+};
 
 
 

@@ -125,11 +125,18 @@ void SurfaceGeometry::setData(const QByteArray &pos, const unsigned int &rowCoun
         _colCount = colCount;
         emit gridSizeChanged(_rowCount, _colCount);
         emit updateIndicesRequested();
+
+        positionBuffer->setData(pos);
+        positionAttribute->setCount(newLatticeCount);
+
         emit updateColorVertexRequested(pos);
         emit updateNormalVertexRequested(pos);
     }
     else
     {
+        positionBuffer->setData(pos);
+        positionAttribute->setCount(newLatticeCount);
+
         emit updateColorVertexRequested(pos);
         emit updateNormalVertexRequested(pos);
     }
@@ -168,6 +175,68 @@ SurfaceMesh::SurfaceMesh(Qt3DCore::QNode *parent)
     setGeometry(new SurfaceGeometry(this));
 
     //setPrimitiveType(Qt3DRender::QGeometryRenderer::)
+}
+
+
+
+
+
+
+
+#include <QVBoxLayout>
+#include <QFormLayout>
+#include <QComboBox>
+#include "gridmesh.h"
+
+SurfaceMeshSettingWidget::SurfaceMeshSettingWidget(SurfaceMesh *mesh, QWidget *parent)
+    : AbstractComponentsSettingWidget(mesh, "SurfaceMesh", parent)
+    , mesh(mesh)
+    , vLayout(new QVBoxLayout(contents))
+    , selectorSettingWidget(nullptr)
+{
+    QFormLayout *fLayout = new QFormLayout;
+    QComboBox *colorMapTypeCombo = new QComboBox(contents);
+    QComboBox *dataTypeCombo = new QComboBox(contents);
+
+    contents->setLayout(vLayout);
+    vLayout->addLayout(fLayout);
+    fLayout->addRow("Color Map", colorMapTypeCombo);
+    fLayout->addRow("Data Type", dataTypeCombo);
+
+    colorMapTypeCombo->addItems(enumToStrings(GridColorVertex::ColorMapType(0)));
+    dataTypeCombo->addItems(enumToStrings(GridMeshSettingWidget::DataType(0)));
+
+    connect(colorMapTypeCombo, &QComboBox::currentIndexChanged, mesh, &SurfaceMesh::setColorMapType);
+    connect(dataTypeCombo, &QComboBox::currentIndexChanged, this, &SurfaceMeshSettingWidget::setDataSelector);
+}
+
+void SurfaceMeshSettingWidget::setDataSelector(const int index)
+{
+    if(selectorSettingWidget) selectorSettingWidget->deleteLater();
+    AbstractGridMeshDataSelector *selector = nullptr;
+
+    switch(GridMeshSettingWidget::DataType(index))
+    {
+    case GridMeshSettingWidget::DataType::Default:
+    {
+        mesh->setDefaultSurface();
+        selectorSettingWidget = nullptr;
+        return;
+    }
+    case GridMeshSettingWidget::DataType::DLL:
+    {
+        selector = new GridMeshDataDllSelector(nullptr);
+        selectorSettingWidget = selector->settingWidget(contents);
+        break;
+    }
+    default:
+        return;
+    }
+
+    connect(selector, &AbstractGridMeshDataSelector::dataSelected, mesh, &SurfaceMesh::setData);
+    connect(selectorSettingWidget, &QWidget::destroyed, selector, &AbstractGridMeshDataSelector::deleteLater);
+
+    vLayout->addWidget(selectorSettingWidget);
 }
 
 
