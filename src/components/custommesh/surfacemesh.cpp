@@ -110,14 +110,14 @@ void SurfaceGeometry::setData(const QByteArray &pos, const unsigned int &rowCoun
 
     if(newLatticeCount > oldLatticeCount)
     {
-        positionBuffer->setData(pos);
-        positionAttribute->setCount(newLatticeCount);
         _rowCount = rowCount;
         _colCount = colCount;
         emit gridSizeChanged(_rowCount, _colCount);
         emit updateColorVertexRequested(pos);
         emit updateNormalVertexRequested(pos);
         emit updateIndicesRequested();
+        positionBuffer->setData(pos);
+        positionAttribute->setCount(newLatticeCount);
     }
     else if(newLatticeCount < oldLatticeCount)
     {
@@ -126,19 +126,17 @@ void SurfaceGeometry::setData(const QByteArray &pos, const unsigned int &rowCoun
         emit gridSizeChanged(_rowCount, _colCount);
         emit updateIndicesRequested();
 
-        positionBuffer->setData(pos);
-        positionAttribute->setCount(newLatticeCount);
-
         emit updateColorVertexRequested(pos);
         emit updateNormalVertexRequested(pos);
+        positionBuffer->setData(pos);
+        positionAttribute->setCount(newLatticeCount);
     }
     else
     {
-        positionBuffer->setData(pos);
-        positionAttribute->setCount(newLatticeCount);
-
         emit updateColorVertexRequested(pos);
         emit updateNormalVertexRequested(pos);
+        positionBuffer->setData(pos);
+        positionAttribute->setCount(newLatticeCount);
     }
 }
 
@@ -196,17 +194,32 @@ SurfaceMeshSettingWidget::SurfaceMeshSettingWidget(SurfaceMesh *mesh, QWidget *p
 {
     QFormLayout *fLayout = new QFormLayout;
     QComboBox *colorMapTypeCombo = new QComboBox(contents);
+    QDoubleSpinBox *colorMinValueSpinBox = new QDoubleSpinBox(contents);
+    QDoubleSpinBox *colorMaxValueSpinBox = new QDoubleSpinBox(contents);
     QComboBox *dataTypeCombo = new QComboBox(contents);
 
     contents->setLayout(vLayout);
     vLayout->addLayout(fLayout);
     fLayout->addRow("Color Map", colorMapTypeCombo);
+    fLayout->addRow("Color Min", colorMinValueSpinBox);
+    fLayout->addRow("Color Max", colorMaxValueSpinBox);
     fLayout->addRow("Data Type", dataTypeCombo);
 
     colorMapTypeCombo->addItems(enumToStrings(GridColorVertex::ColorMapType(0)));
     dataTypeCombo->addItems(enumToStrings(GridMeshSettingWidget::DataType(0)));
 
+    constexpr double spinBoxRange = 100000.0;
+    colorMinValueSpinBox->setMinimum(-spinBoxRange);
+    colorMinValueSpinBox->setMaximum(spinBoxRange);
+    colorMaxValueSpinBox->setMinimum(-spinBoxRange);
+    colorMaxValueSpinBox->setMaximum(spinBoxRange);
+    //この初期値はSurfaceMesh::setDefaultSurface()を参照
+    colorMinValueSpinBox->setValue(-10.0);
+    colorMaxValueSpinBox->setValue(10.0);
+
     connect(colorMapTypeCombo, &QComboBox::currentIndexChanged, mesh, &SurfaceMesh::setColorMapType);
+    connect(colorMinValueSpinBox, &QDoubleSpinBox::valueChanged, mesh, &SurfaceMesh::setColorMapMinValue);
+    connect(colorMaxValueSpinBox, &QDoubleSpinBox::valueChanged, mesh, &SurfaceMesh::setColorMapMaxValue);
     connect(dataTypeCombo, &QComboBox::currentIndexChanged, this, &SurfaceMeshSettingWidget::setDataSelector);
 }
 

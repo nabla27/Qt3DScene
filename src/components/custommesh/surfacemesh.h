@@ -21,9 +21,12 @@ public:
 public:
     void setDefaultSurface();
     void setData(const QByteArray& pos, const unsigned int& rowCount, const unsigned int& colCount);
-    void setColorMapMaxValue(const float& value) { emit colorMapMaxValueChanged(value); }
-    void setColorMapMinValue(const float& value) { emit colorMapMinValueChanged(value); }
-    void setColorMapType(const GridColorVertex::ColorMapType& type) { emit colorMapTypeChanged(type); }
+    void setColorMapMaxValue(const float& value)
+    { emit colorMapMaxValueChanged(value); emit updateColorVertexRequested(positionBuffer->data());  }
+    void setColorMapMinValue(const float& value)
+    { emit colorMapMinValueChanged(value); emit updateColorVertexRequested(positionBuffer->data()); }
+    void setColorMapType(const GridColorVertex::ColorMapType& type)
+    { emit colorMapTypeChanged(type); emit updateColorVertexRequested(positionBuffer->data()); }
 
 private slots:
     void updateIndices(const QByteArray& indices, const unsigned int& count);

@@ -8,6 +8,7 @@
 //DEBUG
 #include "transformanimation.h"
 #include "gridmeshanimation.h"
+#include "surfacemeshanimation.h"
 #include <Qt3DCore/QTransform>
 
 AnimationGroupSettingWidget::AnimationGroupSettingWidget(Qt3DCore::QEntity *entity, Qt3DCore::QComponent *c, QWidget *parent)
@@ -411,6 +412,9 @@ void SelectControllerWidget::changeComponentsList(const QModelIndex& index)
     case ControllerTarget::GridMesh:
         getObjectNamesFromComponents(entity->componentsOfType<GridMesh>(), list);
         break;
+    case ControllerTarget::SurfaceMesh:
+        getObjectNamesFromComponents(entity->componentsOfType<SurfaceMesh>(), list);
+        break;
     default:
         break;
     }
@@ -452,6 +456,11 @@ void SelectControllerWidget::createController()
     case ControllerType::GridMeshDLLController:
     {
         controller = new GridMeshDllController(entity->componentsOfType<GridMesh>().at(componentsListWidget->currentRow()));
+        break;
+    }
+    case ControllerType::SurfaceMeshDLLController:
+    {
+        controller = new SurfaceMeshDllController(entity->componentsOfType<SurfaceMesh>().at(componentsListWidget->currentRow()));
         break;
     }
     default:

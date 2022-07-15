@@ -146,9 +146,10 @@ class SelectControllerWidget : public QWidget
 public:
     explicit SelectControllerWidget(QWidget *parent, Qt3DCore::QEntity *entity);
 
-    enum class ControllerTarget { Transform, GridMesh, };
+    enum class ControllerTarget { Transform, GridMesh, SurfaceMesh };
     enum class ControllerType { TransformDLLController = 0,
-                                GridMeshDLLController = 100, };
+                                GridMeshDLLController = 100,
+                                SurfaceMeshDLLController = 200, };
     static constexpr int enumStride = 100;
     Q_ENUM(ControllerTarget)
     Q_ENUM(ControllerType)
