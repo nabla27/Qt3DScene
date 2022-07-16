@@ -395,7 +395,9 @@ void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSe
 #include <Qt3DExtras/QPlaneMesh>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QTorusMesh>
+#include "components/custommesh/linemesh.h"
 #include "ecstruct.h"
+
 void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
 {
     Qt3DCore::QComponent *mesh = nullptr;
@@ -438,6 +440,12 @@ void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
     case ECStruct::ComponentsSet::TorusMesh:
     {
         mesh = new Qt3DExtras::QTorusMesh(entityItem->entity);
+        break;
+    }
+    case ECStruct::ComponentsSet::LineMesh:
+    {
+        mesh = new LineMesh(entityItem->entity);
+        widget = new LineMeshSettingWidget(static_cast<LineMesh*>(mesh), contentsArea);
         break;
     }
     default:

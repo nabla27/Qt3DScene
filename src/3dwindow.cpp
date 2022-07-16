@@ -7,6 +7,10 @@
 #include <QStandardItemModel>
 #include <QTreeWidget>
 
+//DEBUG
+#include <Qt3DExtras/QFirstPersonCameraController>
+#include "extrasentity/cameracontroller.h"
+
 Window3D::Window3D()
     : Qt3DExtras::Qt3DWindow()
     , rootEntity(new Qt3DCore::QEntity)
@@ -19,9 +23,17 @@ Window3D::Window3D()
     camera()->setViewCenter(QVector3D(0, 0, 0));
     camera()->setPosition(QVector3D(0, 0, 40.0f));
 
-    orbitCamController->setLinearSpeed(50.0f);
-    orbitCamController->setLookSpeed(180.0f);
-    orbitCamController->setCamera(camera());
+    //orbitCamController->setLinearSpeed(50.0f);
+    //orbitCamController->setLookSpeed(180.0f);
+    //orbitCamController->setCamera(camera());
+
+    //DEBUG
+    //Qt3DExtras::QFirstPersonCameraController *c = new Qt3DExtras::QFirstPersonCameraController(camera());
+    //c->setCamera(camera());
+
+    //DEBUG
+    FpsCameraController *fc = new FpsCameraController(camera());
+    fc->setCamera(camera());
 
     //DEBUG
     registerAspect(new CustomAspect(this));  //Aspectの登録

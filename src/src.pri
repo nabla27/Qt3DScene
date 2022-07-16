@@ -18,3 +18,4 @@ SOURCES += $$PWD/main.cpp \
 RESOURCES +=
 
 include(components/components.pri)
+include(extrasentity/extrasentity.pri)

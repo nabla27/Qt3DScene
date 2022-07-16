@@ -19,3 +19,4 @@ SOURCES += \
 
 include(animation/animation.pri)
 include(custommesh/custommesh.pri)
+include(physics/physics.pri)
