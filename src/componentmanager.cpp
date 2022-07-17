@@ -396,7 +396,12 @@ void ComponentsSettingPage::createMaterialComponent(const ECStruct::ComponentsSe
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QTorusMesh>
 #include "components/custommesh/linemesh.h"
+#include "components/custommesh/lineaxismesh.h"
 #include "ecstruct.h"
+
+//DEBUG
+#include <Qt3DRender/QRayCaster>
+#include <Qt3DLogic/QFrameAction>
 
 void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
 {
@@ -444,8 +449,33 @@ void ComponentsSettingPage::createMeshComponent(const ECStruct::ComponentsSet c)
     }
     case ECStruct::ComponentsSet::LineMesh:
     {
-        mesh = new LineMesh(entityItem->entity);
-        widget = new LineMeshSettingWidget(static_cast<LineMesh*>(mesh), contentsArea);
+        LineMesh *line = new LineMesh(entityItem->entity);
+        widget = new LineMeshSettingWidget(line, contentsArea);
+
+        //DEBUG
+        Qt3DRender::QRayCaster *ray = new Qt3DRender::QRayCaster(entityItem->entity);
+        entityItem->entity->addComponent(ray);
+        connect(static_cast<LineGeometry*>(line->geometry()), &LineGeometry::originChanged, ray, &Qt3DRender::QRayCaster::setOrigin);
+        connect(static_cast<LineGeometry*>(line->geometry()), &LineGeometry::directionChanged, ray, &Qt3DRender::QRayCaster::setDirection);
+        connect(static_cast<LineGeometry*>(line->geometry()), &LineGeometry::lengthChanged, ray, &Qt3DRender::QRayCaster::setLength);
+        connect(ray, &Qt3DRender::QRayCaster::hitsChanged, [](const Qt3DRender::QRayCaster::Hits& hits){
+            //if(hits.count() > 1) qDebug() << hits.at(1).localIntersection() << hits.at(1).worldIntersection() << hits.at(1).distance() << hits.count();
+        });
+        //DEBUG
+        Qt3DLogic::QFrameAction *frame = new Qt3DLogic::QFrameAction(entityItem->entity);
+        entityItem->entity->addComponent(frame);
+        connect(frame, &Qt3DLogic::QFrameAction::triggered, [ray](const float dt){
+            ray->trigger();
+        });
+
+        mesh = line;
+        break;
+    }
+    case ECStruct::ComponentsSet::LineAxis:
+    {
+        LineAxisMesh *axis = new LineAxisMesh(entityItem->entity);
+        widget = new LineAxisMeshSettingWidget(axis, contentsArea);
+        mesh = axis;
         break;
     }
     default:

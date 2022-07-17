@@ -40,7 +40,7 @@ public:
         NormalDiffuseMapMaterial, NormalDiffuseSpecularMapMaterial, PerVertexColorMaterial, PhongAlphaMaterial, PhongMaterial, TextureMaterial,
 
         /* Mesh */
-        ConeMesh = 1200, CuboidMesh, CylinderMesh, ExtrudedTextMesh, PlaneMesh, SphereMesh, TorusMesh, LineMesh,
+        ConeMesh = 1200, CuboidMesh, CylinderMesh, ExtrudedTextMesh, PlaneMesh, SphereMesh, TorusMesh, LineMesh, LineAxis,
 
         /* Animation */
         BasicAnimation = 1300, GroupAnimation,

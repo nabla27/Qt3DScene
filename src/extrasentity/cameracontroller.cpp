@@ -1,6 +1,5 @@
 #include "cameracontroller.h"
 
-#include <Qt3DExtras/QCylinderMesh>
 
 FpsCameraController::FpsCameraController(Qt3DCore::QNode *parent)
     : Qt3DCore::QEntity(parent)
@@ -118,7 +117,6 @@ void FpsCameraController::setup()
         }
     });
 
-
     applyInputAccelerations();
 }
 
@@ -158,7 +156,7 @@ void FpsCameraController::moveCamera(const float &dt)
         //DEBUG
         rayCaster->trigger(camera->position(), QVector3D(0.0f, -1.0f, 0.0f), 5.0f);
 
-        qDebug() << camera->position() << grand;
+        //qDebug() << camera->position() << grand;
 
         //if(isPhysics)
         //{
