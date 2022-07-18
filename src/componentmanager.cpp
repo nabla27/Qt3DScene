@@ -519,6 +519,7 @@ void ComponentsSettingPage::createAnimationComponent(const ECStruct::ComponentsS
 #include "components/custommesh/gridmesh.h"
 #include "components/custommesh/explicitfuncmesh.h"
 #include "components/custommesh/surfacemesh.h"
+#include "components/custommesh/vector3dmesh.h"
 void ComponentsSettingPage::createPlotComponent(const ECStruct::ComponentsSet c)
 {
     AbstractComponentsSettingWidget *widget = nullptr;
@@ -544,6 +545,13 @@ void ComponentsSettingPage::createPlotComponent(const ECStruct::ComponentsSet c)
     {
         ExplicitFuncMesh *mesh = new ExplicitFuncMesh(entityItem->entity);
         widget = new ExplicitFuncMeshSettingWidget(mesh, contentsArea);
+        comp = mesh;
+        break;
+    }
+    case ECStruct::ComponentsSet::Vector3D:
+    {
+        Vector3DMesh *mesh = new Vector3DMesh(entityItem->entity);
+        widget = new Vector3DMeshSettingWidget(mesh, contentsArea);
         comp = mesh;
         break;
     }
